@@ -1,5 +1,5 @@
 %s180228_allesschnelldownsamplen
- 
+% Kommentar.
   
 clear all
 dateien=dir('*.mat');
