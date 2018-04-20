@@ -7,7 +7,7 @@
 % load into structure with dynamic fieldnames
 clear all
 mkdir trialappend
-% doppelte finden
+% doppelte finden 
 load VAR_datakey
 aList={datakey.key(:).MAT_name_final}';
     aList = cellfun(@num2str, aList, 'Un', 0 );

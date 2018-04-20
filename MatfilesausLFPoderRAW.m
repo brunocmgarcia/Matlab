@@ -1,6 +1,6 @@
 %% s171117matfilesausLFPoderRAW erstelle data.mat files anhand von tier und TP angabe
 % mein LP filter ist ein 6th order butterworth filter, zweimal durchlaufen,
-
+ 
 
 %% 
 clear all

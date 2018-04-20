@@ -1,6 +1,6 @@
 %s180228_allesschnelldownsamplen
-
-
+ 
+  
 clear all
 dateien=dir('*.mat');
 dateien={dateien.name};
