@@ -70,39 +70,31 @@ for behavei=1:3
 
             clearvars -except Liste datei_i fd behavei animali animals behavior tier behav VAR_datakey includedchannels
         end
-% 
-%         myfig=figure('Name',[tier ':' behav]);
-%         mylim=[-0.6 .6];
-%         CM = jet(14);
-%         subplot(3,1,1)
-%         hold on
-%         for i=1:length(fd)
-%         plot(fd(i).freq, (fd(i).cohspctrm(1,:)), 'color', CM(i,:))
-%         end
-%         hold off
-% 
-%         ylim(mylim)
-%         subplot(3,1,2)
-%         hold on
-%         for i=1:length(fd)
-%         plot(fd(i).freq, (fd(i).cohspctrm(2,:)), 'color', CM(i,:))
-%         end
-%         hold off
-% 
-%         ylim(mylim)
-%         subplot(3,1,3)
-%         hold on
-%         for i=1:length(fd)
-%         plot(fd(i).freq, (fd(i).cohspctrm(3,:)), 'color', CM(i,:))
-%         end
-%         hold off
-% 
-%         ylim(mylim)
+        
+
          save(['F:/Auswertung/FINAL180416/AllCombIcoh/' tier behav '.mat'],'fd')
-%      %   saveas(myfig,['/Volumes/A_guettlec/Auswertung/FINAL180416/' tier behav]);
+
         clearvars fd tier behav
-%      %   close all
+
     
     end
 end
 
+%% visualisieren
+% load any fd
+myfig=figure('Name',xxxx); % namen raussuchen aus fd
+mylim=[-0.6 .6];
+CM = jet(length(fd));
+anzahlcombi=length(fd(1).cohspctrm));
+for comb_i=1:anzahlcombi
+
+    subplot(floor(anzahlcombi/2),ceil(anzahlcombi/2),comb_i)
+    hold on
+    for i=1:length(fd)
+        plot(fd(i).freq, (fd(i).cohspctrm(1,:)), 'color', CM(i,:))
+    end
+    hold off
+    ylim(mylim)
+   
+end
+saveas(myfig,['/Volumes/A_guettlec/Auswertung/FINAL180416/' tier behav]);
