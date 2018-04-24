@@ -80,21 +80,37 @@ for behavei=1:3
     end
 end
 
-%% visualisieren
-% load any fd
-myfig=figure('Name',xxxx); % namen raussuchen aus fd
-mylim=[-0.6 .6];
-CM = jet(length(fd));
-anzahlcombi=length(fd(1).cohspctrm));
-for comb_i=1:anzahlcombi
+% %% visualisieren
+% % load any fd
+% clear all
+% cd('F:\Auswertung\FINAL180416\AllCombIcoh')
+% files=dir('*.mat');
+% for file_i=1:length(files)
+%     load(files(file_i).name)
+%     mkdir([files(file_i).name(1:end-4) '_n1to1'])
+%     cd(files(file_i).name(1:end-4))
+%      % namen raussuchen aus fd
+%     mylim=[-1 1];
+%     CM = jet(length(fd));
+%     anzahlcombi=length(fd(1).labelcmb);
+%     for comb_i=1:anzahlcombi
+% 
+%         %=figure%subplot(ceil(sqrt(anzahlcombi)),ceil(sqrt(anzahlcombi)),comb_i);
+%         myplot=figure('Name',files(file_i).name(1:end-4), 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
+%         %axis tight
+%         hold on
+%         for i=1:length(fd)
+%             plot(fd(i).freq, (fd(i).cohspctrm(comb_i,:)), 'color', CM(i,:))
+%         end
+%         hold off
+%         title([fd(1).labelcmb{comb_i, 1}  ' zu ' fd(1).labelcmb{comb_i, 2}]);
+%         ylim(mylim)
+%         speichername=[fd(1).labelcmb{comb_i, 1}  ' zu ' fd(1).labelcmb{comb_i, 2} '.png']; 
+%         speichername=strrep(speichername, ' ','_');
+%         speichername=strrep(speichername, ':','');
+%         saveas(myplot,speichername);
+%         close(myplot)
+%     end
+%     cd ..
+% end
 
-    subplot(floor(anzahlcombi/2),ceil(anzahlcombi/2),comb_i)
-    hold on
-    for i=1:length(fd)
-        plot(fd(i).freq, (fd(i).cohspctrm(1,:)), 'color', CM(i,:))
-    end
-    hold off
-    ylim(mylim)
-   
-end
-saveas(myfig,['/Volumes/A_guettlec/Auswertung/FINAL180416/' tier behav]);
