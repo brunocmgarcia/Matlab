@@ -5,9 +5,16 @@ clc
 cd('F:\Auswertung\FINAL180416\02_downsampledTo500Hz')
 
 IncludedAnimals={'CG02';'CG04';'CG05';'CG06';'CG07'};
+load VAR_datakey
+goodchannels{1}=datakey.key(78).includedchannels;
+goodchannels{2}=datakey.key(240).includedchannels;
+goodchannels{3}=datakey.key(370).includedchannels;
+goodchannels{4}=datakey.key(500).includedchannels;
+goodchannels{5}=datakey.key(636).includedchannels;
+
 
 IncludedParad={'Ruhe';'LB10';'LB20'};
-totalpsd=zeros(length(IncludedAnimals),length(IncludedParad),31,2049);
+totalpsd=zeros(length(IncludedAnimals),length(IncludedParad),5,32,2049);
 for paradigm_i=1:size(IncludedParad,1)
     for animal_i=1:size(IncludedAnimals,1)
             tier=(IncludedAnimals(animal_i));
@@ -16,13 +23,21 @@ for paradigm_i=1:size(IncludedParad,1)
             paradigm=paradigm{:};
             Liste=dir(['*' tier '*' paradigm '*']);
             Liste={Liste.name}';
-
-          %  figure
+          
+          
             for datei_i=1:length(Liste)
 
                 aktuelle_datei=Liste(datei_i);
                 load(aktuelle_datei{:})
-
+                
+                goodsnrchannels=find(~cellfun('isempty', strfind(data.label, 'SNR'))); 
+                [goodsnrchannelsind verwerfen]=find(ismember(goodsnrchannels,cell2mat(goodchannels(animal_i))));
+                goodsnrchannels=goodsnrchannels(goodsnrchannelsind);                 
+                goodstriatumchannels=find(~cellfun('isempty', strfind(data.label, 'STR'))); 
+                [goodstriatumchannelsind verwerfen]=find(ismember(goodstriatumchannels,cell2mat(goodchannels(animal_i))));
+                goodstriatumchannels=goodstriatumchannels(goodstriatumchannelsind);
+                clearvars goodsnrchannelsind goodstriatumchannelsind verwerfen
+                
                 cfg=[];
                 cfg.demean='yes';
                 cfg.reref='yes';
@@ -61,11 +76,11 @@ for paradigm_i=1:size(IncludedParad,1)
                     cfg.length=0.9;
                     data = ft_redefinetrial(cfg, data);  
 
-
+             
 
             %%
                      for i=1:length(data.trial) 
-                         daten=(data.trial{1,i}(30,:)')/800;
+                         daten=(data.trial{1,i}(:,:)')/800;
                          %daten=mean(daten,2);
                          welch(:,:,i)=daten;
 
@@ -86,18 +101,33 @@ for paradigm_i=1:size(IncludedParad,1)
 
                     welch=pxx;
                     clearvars pxx
-                    welch_average=mean(welch,3);
-
+                    
+                    
+                    
+                    welch_trial_average_striatum=mean(welch(:,goodstriatumchannels,:),3);
+                    welch_trial_average_striatum=mean(welch_trial_average_striatum,2);
+                    welch_trial_average_striatumall=mean(welch(:,[1:15],:),3);
+                    welch_trial_average_striatumall=mean(welch_trial_average_striatumall,2);
+                    welch_trial_average_snr=mean(welch(:,goodsnrchannels,:),3);
+                    welch_trial_average_snr=mean(welch_trial_average_snr,2);
+                    welch_trial_average_snrall=mean(welch(:,[16:29],:),3);
+                    welch_trial_average_snrall=mean(welch_trial_average_snrall,2);
+                    welch_trial_average_m1=mean(welch(:,30,:),3);
+%                     figure
+%                     subplot(1,2,1)
+%                     plot(welch_freq,welch_trial_average_striatum)
+%                     subplot(1,2,2)
+%                     plot(welch_freq,welch_trial_average_striatumall)
             
-                [c norm_index_unten1] = min(abs(welch_freq-4));
-                [c norm_index_oben1] = min(abs(welch_freq-8));
-                clearvars c
-
-                [c norm_index_unten2] = min(abs(welch_freq-55));
-                [c norm_index_oben2] = min(abs(welch_freq-65));
-                clearvars c
-
-                normfaktor=mean(welch_average([norm_index_unten1:norm_index_oben1 norm_index_unten2:norm_index_oben2],:));
+%                 [c norm_index_unten1] = min(abs(welch_freq-4));
+%                 [c norm_index_oben1] = min(abs(welch_freq-8));
+%                 clearvars c
+% 
+%                 [c norm_index_unten2] = min(abs(welch_freq-55));
+%                 [c norm_index_oben2] = min(abs(welch_freq-65));
+%                 clearvars c
+% 
+%                 normfaktor=mean(welch_average([norm_index_unten1:norm_index_oben1 norm_index_unten2:norm_index_oben2],:));
 
             %     
             % % %  variante mit 1/f^2 scaling   
@@ -107,9 +137,13 @@ for paradigm_i=1:size(IncludedParad,1)
             % %     
             %     
             %     
-                welch_average_norm= bsxfun(@rdivide, welch_average, normfaktor);
-                
-                totalpsd(animal_i,paradigm_i,str2num(aktuelle_datei{1, 1}(8:9))+1,:)=welch_average; %cave:not normalized!
+%                 welch_average_norm= bsxfun(@rdivide, welch_average, normfaktor);
+           totalpsd=zeros(length(IncludedAnimals),length(IncludedParad),5,32,2049);     
+           totalpsd(animal_i,paradigm_i,1,str2num(aktuelle_datei{1, 1}(8:9))+1,:)=welch_trial_average_striatum;
+           totalpsd(animal_i,paradigm_i,2,str2num(aktuelle_datei{1, 1}(8:9))+1,:)=welch_trial_average_striatumall;
+           totalpsd(animal_i,paradigm_i,3,str2num(aktuelle_datei{1, 1}(8:9))+1,:)=welch_trial_average_snr;
+           totalpsd(animal_i,paradigm_i,4,str2num(aktuelle_datei{1, 1}(8:9))+1,:)=welch_trial_average_snrall;
+           totalpsd(animal_i,paradigm_i,5,str2num(aktuelle_datei{1, 1}(8:9))+1,:)=welch_trial_average_m1 ;%cave:not normalized!
                 
                 
 %                     subplot(3,6,datei_i)
@@ -143,7 +177,8 @@ for paradigm_i=1:size(IncludedParad,1)
 %                     drawnow
                     clearvars welch welch_average welch_average_norm tier paradigm normfaktor ...
                         norm_index_unten2 norm_index_unten1 norm_index_oben2 norm_index_oben1 i daten data cfg ...
-                        artifact_low 
+                        artifact_low welch_trial_average_m1 welch_trial_average_snr welch_trial_average_snrall ...
+                        welch_trial_average_striatum welch_trial_average_striatumall goodsnrchannels goodstriatumchannels
             end
 % 
 %              set(mygca, 'Xlim', [4 65])
