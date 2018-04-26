@@ -2,6 +2,7 @@
 clear all
 close all
 clc
+aktuellerordner=cd;
 cd('F:\Auswertung\FINAL180416\02_downsampledTo500Hz')
 
 IncludedAnimals={'CG02';'CG04';'CG05';'CG06';'CG07'};
@@ -68,7 +69,7 @@ for paradigm_i=1:size(IncludedParad,1)
                            cfg.artfctdef.reject = 'partial';
                            data=ft_rejectartifact(cfg,data);
 
-          %     data=specialreref(data);
+              % data=specialreref(data);
 
 
 
@@ -90,10 +91,26 @@ for paradigm_i=1:size(IncludedParad,1)
                         %[pxx(:,:,i), welch_freq(:,1)]=pwelch(welch(:,:,i), [], [], [], data.fsample);  % mit hamming(auto) 
                         [pxx(:,:,i), welch_freq(:,1)]=(pwelch(welch(:,:,i), hanning(175), [], 4096, 500, 'psd'));  % mit hanning statt hamming
 
+                        if i==1
+                            [c norm_index_unten1] = min(abs(welch_freq-4));
+                            [c norm_index_oben1] = min(abs(welch_freq-14));
+                            clearvars c
+                            [c norm_index_unten2] = min(abs(welch_freq-55));
+                            [c norm_index_oben2] = min(abs(welch_freq-65));
+                            clearvars c
+                        end
+
+                normfaktor=mean(pxx([norm_index_unten1:norm_index_oben1],:,i));
+                pxx(:,:,i)= bsxfun(@rdivide, (pxx(:,:,i)), normfaktor);
+                normfaktor=mean(pxx([norm_index_unten2:norm_index_oben2],:,i));
+                pxx(:,:,i)= bsxfun(@minus, (pxx(:,:,i)), normfaktor);
+                
+                        
+                        
             %             normfaktor= repmat(welch_freq,1,size(pxx(:,:,i),2));
             %             normfaktor=(normfaktor.^2);
             %             normfaktor=1./normfaktor;
-            %             pxx(:,:,i)= bsxfun(@rdivide, pxx(:,:,i), normfaktor);
+            %            
 
 
 
@@ -102,6 +119,8 @@ for paradigm_i=1:size(IncludedParad,1)
                     welch=pxx;
                     clearvars pxx
                     
+%                     welch=
+%                     a = bsxfun(@rdivide, a, nanmean(a(:,[1:2 5:6]),2));
                     
                     
                     welch_trial_average_striatum=mean(welch(:,goodstriatumchannels,:),3);
@@ -119,15 +138,6 @@ for paradigm_i=1:size(IncludedParad,1)
 %                     subplot(1,2,2)
 %                     plot(welch_freq,welch_trial_average_striatumall)
             
-%                 [c norm_index_unten1] = min(abs(welch_freq-4));
-%                 [c norm_index_oben1] = min(abs(welch_freq-8));
-%                 clearvars c
-% 
-%                 [c norm_index_unten2] = min(abs(welch_freq-55));
-%                 [c norm_index_oben2] = min(abs(welch_freq-65));
-%                 clearvars c
-% 
-%                 normfaktor=mean(welch_average([norm_index_unten1:norm_index_oben1 norm_index_unten2:norm_index_oben2],:));
 
             %     
             % % %  variante mit 1/f^2 scaling   
@@ -138,7 +148,7 @@ for paradigm_i=1:size(IncludedParad,1)
             %     
             %     
 %                 welch_average_norm= bsxfun(@rdivide, welch_average, normfaktor);
-           totalpsd=zeros(length(IncludedAnimals),length(IncludedParad),5,32,2049);     
+ %          totalpsd=zeros(length(IncludedAnimals),length(IncludedParad),5,32,2049);     
            totalpsd(animal_i,paradigm_i,1,str2num(aktuelle_datei{1, 1}(8:9))+1,:)=welch_trial_average_striatum;
            totalpsd(animal_i,paradigm_i,2,str2num(aktuelle_datei{1, 1}(8:9))+1,:)=welch_trial_average_striatumall;
            totalpsd(animal_i,paradigm_i,3,str2num(aktuelle_datei{1, 1}(8:9))+1,:)=welch_trial_average_snr;
@@ -175,7 +185,7 @@ for paradigm_i=1:size(IncludedParad,1)
 %               catch
 %               end
 %                     drawnow
-                    clearvars welch welch_average welch_average_norm tier paradigm normfaktor ...
+                    clearvars welch welch_average normfaktor welch_average_norm tier paradigm normfaktor ...
                         norm_index_unten2 norm_index_unten1 norm_index_oben2 norm_index_oben1 i daten data cfg ...
                         artifact_low welch_trial_average_m1 welch_trial_average_snr welch_trial_average_snrall ...
                         welch_trial_average_striatum welch_trial_average_striatumall goodsnrchannels goodstriatumchannels
@@ -211,22 +221,50 @@ for paradigm_i=1:size(IncludedParad,1)
            
     end
 end
+cd(aktuellerordner)
+save totalpsd_reref31_normeverytrial totalpsd welch_freq
 
-figure
-mycolormap=jet(size(totalpsd,3));
-for timepoint=1:size(totalpsd,3)
-    hold on
-        plot(welch_freq,squeeze(nanmean(totalpsd(:,1,timepoint,:),1)), 'Color', mycolormap(timepoint,:))
-    hold off
+clearvars -except totalpsd welch_freq 
+
+for channel_i=1:5
+    for paradigm_i=1:3
+        myfig=figure('Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
+        title(['Paradigma: ' num2str(paradigm_i) ' / ChannelID: ' num2str(channel_i)])
+        for animal_i=1:5
+        subplot(2,3,animal_i)
+        mycolormap=jet(size(totalpsd,4));
+        for timepoint=[1 4:size(totalpsd,4)]
+            hold on
+                plot(welch_freq,squeeze(totalpsd(animal_i,paradigm_i,channel_i,timepoint,:)), 'Color', mycolormap(timepoint,:))
+            hold off
+        end
+            set(gca, 'Xlim', [5 65])
+            set(gca, 'XTick', 5:5:65)
+            set(gca, 'Ylim', [0 1])   % 1.5
+            set(gca, 'XMinorGrid', 'on')
+            set(gca, 'YGrid', 'on')
+            %title(aktuelle_datei{1,1}(1:15), 'Interpreter', 'none', 'FontSize', 8)  
+            xlabel('Frequency [Hz]', 'FontSize', 8)
+            ylabel('Power [a.u.]', 'FontSize', 8)
+        end
+        subplot(2,3,6)
+        for timepoint=[1 4:size(totalpsd,4)]
+            hold on
+                plot(welch_freq,squeeze(nanmean(totalpsd(:,paradigm_i,channel_i,timepoint,:),1)), 'Color', mycolormap(timepoint,:))
+            hold off
+        end
+            set(gca, 'Xlim', [5 65])
+            set(gca, 'XTick', 5:5:65)
+            set(gca, 'Ylim', [0 1])   % 1.5
+            set(gca, 'XMinorGrid', 'on')
+            set(gca, 'YGrid', 'on')
+            %title(aktuelle_datei{1,1}(1:15), 'Interpreter', 'none', 'FontSize', 8)  
+            xlabel('Frequency [Hz]', 'FontSize', 8)
+            ylabel('Power [a.u.]', 'FontSize', 8)
+            saveas(myfig,['Parad0' num2str(paradigm_i) '_chantype0' num2str(channel_i) '.png'])
+            savefig(myfig, ['Parad0' num2str(paradigm_i) '_chantype0' num2str(channel_i)])
+            close(myfig)
+    end
 end
-    set(gca, 'Xlim', [5 65])
-    set(gca, 'XTick', 5:5:65)
-    set(gca, 'Ylim', [0 70])   % 1.5
-    set(gca, 'XMinorGrid', 'on')
-    set(gca, 'YGrid', 'on')
-    %title(aktuelle_datei{1,1}(1:15), 'Interpreter', 'none', 'FontSize', 8)  
-    xlabel('Frequency [Hz]', 'FontSize', 8)
-    ylabel('Power [a.u.]', 'FontSize', 8)
-
 %cd('F:\Auswertung\FINAL180416\M1_powerpsd')
 %saveallopenfigures
