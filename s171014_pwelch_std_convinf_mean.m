@@ -2,7 +2,7 @@
 clear all
 close all
 Fs=1000;
-load('CG04_p3120_data.mat');
+load('CG08_TP17_Rec01.mat');
 data=data.trial{1,1}';
 pxx=pwelch(data(:,1:29), hanning(1000), 0, 1000);
 striatum=pxx(:,1:14);
@@ -59,9 +59,9 @@ hold
 %% mit reref
 clear all
 Fs=1000;
-load('CG04_p31_data.mat');
+load('CG10_TP17_Rec01.mat');
 cfg.reref='yes'
-cfg.refchannel='Con LFP Ch14 0';
+cfg.refchannel='31: Cerebellum';
 data=ft_preprocessing(cfg, data);
 data=data.trial{1,1}';
 pxx=pwelch(data(:,1:31), hanning(1000), 0, 1000);
