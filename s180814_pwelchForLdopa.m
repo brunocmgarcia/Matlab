@@ -2,7 +2,7 @@
 
 
 clear all
-cd('/Users/guettlec/Desktop/downsampled_reref_m1')
+cd('F:\Auswertung\180807_LDOPA\downsampled_NOreref_m1')
 
 
 clear all
