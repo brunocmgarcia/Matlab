@@ -10,8 +10,8 @@ clc
 load('VAR_datakey.mat')
 tiere=inputdlg('Welche Tiere sollen in die Analyse eingeschlossen werden?','input',1,{'CG01 CG02 CG03 CG04 CG05 CG06 CG07 CG08 CG09 CG10'},'on');
 tiere=strsplit(tiere{:})';
-%TPs=inputdlg('Welche Zeitpunkte sollen eingeschlossen werden?','input',1,{'0 1 2 3 4 6 8 11 14 17 21 25 29 31'},'on');
-TPs=inputdlg('Welche Zeitpunkte sollen eingeschlossen werden?','input',1,{'101 103 104 107 109 110 112 113 116 119 121 122 200 300 400 500'},'on');
+TPs=inputdlg('Welche Zeitpunkte sollen eingeschlossen werden?','input',1,{'0 1 2 3 4 6 8 11 14 17 21 25 29 31'},'on');
+%TPs=inputdlg('Welche Zeitpunkte sollen eingeschlossen werden?','input',1,{'101 103 104 107 109 110 112 113 116 119 121 122 200 300 400 500'},'on');
 %paradigmata=inputdlg('Welche Paradigmen sollen eingeschlossen werden?','input',1,{'Ruhe LB10 LB20 LB30'},'on');
 %paradigmata=strsplit(paradigmata{:})';
 
