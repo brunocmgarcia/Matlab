@@ -1,3 +1,18 @@
+%% datakey: cells die in cells sind auflösen.
+
+clear all
+clc
+load VAR_datakey
+for i=1:length(datakey.key)
+    inhalt=datakey.key(i).ephys;
+    if iscell(inhalt)
+        
+        inhalt=inhalt{:};
+        datakey.key(i).ephys=inhalt;
+    end
+    clearvars inhalt
+end
+
 %% datakey neu ordnen
 load VAR_datakey
 % in cellarray umwandeln
