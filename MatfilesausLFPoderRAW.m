@@ -65,13 +65,22 @@ clearvars  i
 all_requested_folders(1,:)=[];
 all_zugehoerige_animals(1,:)=[];
 
-for i=1:size(all_requested_folders,1)
-    if str2num(all_requested_folders(i,3:4))<6
-        startordner(i,:)='/Volumes/A_guettlec/Primaerdaten/TBSI';
-    else
-        startordner(i,:)='/Volumes/B_guettlec/Primaerdaten/TBSI';
+if ~ispc
+    for i=1:size(all_requested_folders,1)
+        if str2num(all_requested_folders(i,3:4))<6
+
+            startordner(i,:)='/Volumes/A_guettlec/Primaerdaten/TBSI';
+
+
+        else
+            startordner(i,:)='/Volumes/B_guettlec/Primaerdaten/TBSI';
+        end
+
     end
-   
+else
+    for i=1:size(all_requested_folders,1)
+        startordner(i,:)=startordner(1,:);
+    end
 end
 
 for i=1:size(all_requested_folders,1)
@@ -257,11 +266,14 @@ for i=1:size(all_requested_folders,1)
                 
                 cd ../
                 rmdir(LFPoderRAW,'s');
-                dateiname=sprintf('%s/%s_TP%03d_Rec%02d',zielordner, ...
+                dateiname=sprintf('%s/%s_TP%02d_Rec%02d',zielordner, ...
                     all_zugehoerige_animals(i,:), all_zugehoerige_TP(i), einzelne_aufnahmen_i);
                 
-                index_Ephysliste = find(ismember(string(Ephysliste), string(ordner_i_einzelne_aufnahmen{einzelne_aufnahmen_i}(end-30:end))));
-                datakey.key(index_Ephysliste).MAT_name  =sprintf('%s_TP%03d_Rec%02d', ...
+              
+                Indexhelp = strfind(Ephysliste, ordner_i_einzelne_aufnahmen{einzelne_aufnahmen_i}(end-30:end));
+                index_Ephysliste = find(not(cellfun('isempty', Indexhelp)));
+
+                datakey.key(index_Ephysliste).MAT_name  =sprintf('%s_TP%02d_Rec%02d', ...
                     all_zugehoerige_animals(i,:), all_zugehoerige_TP(i), einzelne_aufnahmen_i);      
                         
                         
