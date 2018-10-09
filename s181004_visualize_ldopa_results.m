@@ -1,6 +1,6 @@
 clear all
 clc
-load VAR_results181004
+load results
 load VAR_wanted181004
 %wanted=wanted';
 %wanted=wanted(:,[1 3 4 5 7]);
@@ -15,14 +15,14 @@ colormap(farben);
 hold on
 for i=1:size(wanted,1)
 test(:,:,i)=p(wanted(i,:),:);
-mittelwert=nanmean(test(:,:,i),1);
-standardabweichung=nanstd(test(:,:,i),1);
-SEM = standardabweichung ./ sqrt(length(test(:,:,i)));
-oben=mittelwert+SEM;
-unten=mittelwert-SEM;
-plot(x,mittelwert, 'Color', farben(i,:))
+mittelwert(i,:)=nanmean(test(:,:,i),1);
+standardabweichung(i,:)=nanstd(test(:,:,i),1);
+SEM = standardabweichung(i,:) ./ sqrt(length(test(:,:,i)));
+oben(i,:)=mittelwert(i,:)+SEM;
+unten(i,:)=mittelwert(i,:)-SEM;
+plot(x,mittelwert(i,:), 'Color', farben(i,:))
 
-jbfill(x,oben,unten,farben(i,:),farben(i,:),0,0.2);
+jbfill(x,oben(i,:),unten(i,:),farben(i,:),farben(i,:),0,0.2);
 
 
 end

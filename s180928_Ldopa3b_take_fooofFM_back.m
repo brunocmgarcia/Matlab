@@ -2,7 +2,7 @@
 %output: jeweils eine figure mit original powspctr, gauss model, flat.
 % flat als lineartransform. dann baseline (flat) abziehen. zusätzlich am schluss eine csv für
 %peaks und linpeak AUC sowie txt liste aller datei namen um am schluss ein
-%excel sheet zu erstellen.
+%excel sheet zu erstellen. 181009: jetzt mit AUC trapz
 
 clear all
 cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN/fooofed')
@@ -110,9 +110,9 @@ for file_i=1:length(files)
             p4=plot(freq,((10.^BLflat)-1), 'Color', 'g');
             legend(p4,'Baseline', 'Location', 'northeast')
             hold off       
-            peakpowerlog(zaehler)=sum(flat(lower:upper));
-            peakpowernolog(zaehler)=sum((10.^flat(lower:upper))-1);
-
+            peakpowerlog(zaehler)=trapz(freq(lower:upper),flat(lower:upper));
+            peakpowernolog(zaehler)=trapz(freq(lower:upper),(10.^flat(lower:upper))-1);
+            
             set(myfig, 'currentaxes', s5)
             ylim([0 1])
             hold on
@@ -124,11 +124,11 @@ for file_i=1:length(files)
             hold on
             plot(freq,((10.^(flat-BLflat))-1), 'Color', farbe(i,:))
             hold off       
-            peakpowerlogBL(zaehler)=sum(flat(lower:upper)-BLflat(lower:upper));
+            peakpowerlogBL(zaehler)=trapz(freq(lower:upper),(flat(lower:upper)-BLflat(lower:upper)));
             peakfreqhelper1=freq(lower:upper);
             [verwerfen,peakfreqhelper2]=max(flat(lower:upper)-BLflat(lower:upper));
             peakfreq(zaehler)=peakfreqhelper1(peakfreqhelper2);
-            peakpowernologBL(zaehler)=sum((10.^(flat(lower:upper)-BLflat(lower:upper)))-1);       
+            peakpowernologBL(zaehler)=trapz(freq(lower:upper),((10.^(flat(lower:upper)-BLflat(lower:upper)))-1));       
         end
     
         set(myfig, 'currentaxes', s1)
