@@ -177,7 +177,7 @@ end
 cd('180')
 ordner=dir('*.mat');
 files={ordner.name}';
-for file_i=1:length(files)
+for file_i=4%1:length(files)
 datei=files(file_i);
 datei=datei{:}
 load(datei)
@@ -194,7 +194,7 @@ cfg.artfctdef.zvalue.bpfiltord   = 3;
 cfg.artfctdef.zvalue.bpfilttype  = 'but';
 cfg.artfctdef.zvalue.hilbert     = 'yes';
 cfg.artfctdef.zvalue.boxcar      = 0.2;
-cfg.artfctdef.zvalue.interactive = 'no';
+cfg.artfctdef.zvalue.interactive = 'yes';
 [cfg, zvalue] = ft_artifact_zvalue(cfg, data);
 cfg.artfctdef.reject='partial';
 data_processed = ft_rejectartifact(cfg, data);
