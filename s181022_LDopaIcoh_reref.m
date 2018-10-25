@@ -6,16 +6,16 @@ clc
 set(0, 'DefaultTextInterpreter', 'none')
 cd('F:\Auswertung\00_LDopa_Paper\01_AppendChannel_fs1000_LP450')
 zielfolder_STR='F:\Auswertung\00_LDopa_Paper\03_connectivity\reref\STR';
-zielfolder_SNR='F:\Auswertung\00_LDopa_Paper\03_connectivity\reref\SNR';
+zielfolder_SNR='F:\Auswertung\00_LDopa_Paper\03_connectivity\reref\SNR\SNR';
 dropboxfolder_STR='C:\Users\guettlec\Dropbox\wpli_img\reref\STR';
-dropboxfolder_SNR='C:\Users\guettlec\Dropbox\wpli_img\reref\SNR';
+dropboxfolder_SNR='C:\Users\guettlec\Dropbox\wpli_img\reref\SNR\SNR';
 ordner=dir('*.mat');
 files={ordner.name}';
 clearvars ordner
 fehler=0;
 IndexC = strfind(files, '180');
 min180aufnahmen = find(not(cellfun('isempty', IndexC)));
-for variante=1:2
+for variante=2
     if variante==1
  
         for file_i=min180aufnahmen' %% alle 180min Ldopaaufnahmen
@@ -156,7 +156,7 @@ for variante=1:2
            catch
                fehler(file_i)=1;
            end
-            clearvars -except file_i files zielfolder_STR zielfolder_SNR dropboxfolder_STR dropboxfolder_SNR fehler variante
+            clearvars -except file_i min180aufnahmen files zielfolder_STR zielfolder_SNR dropboxfolder_STR dropboxfolder_SNR fehler variante
             close all
         end
        
@@ -302,7 +302,7 @@ for variante=1:2
            catch
                fehler(file_i)=1;
            end
-            clearvars -except file_i files zielfolder_STR zielfolder_SNR dropboxfolder_STR dropboxfolder_SNR fehler variante
+            clearvars -except file_i files min180aufnahmen zielfolder_STR zielfolder_SNR dropboxfolder_STR dropboxfolder_SNR fehler variante
             close all
         end
         
