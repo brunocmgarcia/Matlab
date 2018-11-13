@@ -8,10 +8,10 @@ if ispc
     zielfolder='C:\Users\guettlec\Dropbox\data\videoartefaktdef';
     datafolder='F:\Auswertung\171121_nur_appenddata_und_rename_channels';
 else
-    primaerdaten='/Volumes/A_guettlec/Primaerdaten/TBSI/';
-    eigeneskripte='/Users/guettlec/Dropbox/eigeneskripte';
+    primaerdaten='/Volumes/B_guettlec/Primaerdaten/TBSI/';
+    eigeneskripte='/Users/guettlec/Documents/MATLAB/Skripte';
     zielfolder='/Users/guettlec/Dropbox/data/videoartefaktdef';
-    datafolder='/Volumes/A_guettlec/Auswertung/171121_nur_appenddata_und_rename_channels'; 
+    datafolder='/Users/guettlec/Desktop/180621_plainLFPs_CG8910_bis_TP17'; 
 end
     
 load VAR_datakey;
@@ -20,7 +20,7 @@ files=dir('*.mat');
 
 files={files.name}';
 
-for currentfile_i=378:length(files)  % 301 % 1-16 fertig. dann 29-91=CG2. dann 100 
+for currentfile_i=2:length(files)  % 1
     cd(datafolder)
     currentfile=char(files(currentfile_i));
     load(currentfile);
@@ -54,11 +54,14 @@ for currentfile_i=378:length(files)  % 301 % 1-16 fertig. dann 29-91=CG2. dann 1
             cd('C:\Users\guettlec\Dropbox\eigeneskripte\00_variables')
             dateiname=[zielfolder '\' currentfile '_viddef.mat'];
         else
-            cd('/Users/guettlec/Dropbox/eigeneskripte/00_variables')
+            
+            cd('/Users/guettlec/Dropbox/data/00_variables')
+            save 'VAR_datakey.mat' 'datakey'
+            cd('/Users/guettlec/Dropbox/data/videoartefaktdef')
             dateiname=[zielfolder '/' currentfile '_viddef.mat'];
         end
         
-        save 'VAR_datakey.mat' 'datakey'
+        
 
                  
                  

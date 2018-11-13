@@ -3,8 +3,8 @@
 
 clear all
 close all
-%close all
-% cd('F:\Auswertung\171121_nur_appenddata_und_rename_channels\trialappend\downsample')
+close all
+%cd('F:\Auswertung\171121_nur_appenddata_und_rename_channels\trialappend\downsample')
 % if exist(datestr(datetime('now'),  'yymmdd', 2000)) ~= 7
 %     mkdir(datestr(datetime('now'),  'yymmdd', 2000))
 % end

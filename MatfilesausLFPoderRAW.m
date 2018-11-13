@@ -5,13 +5,13 @@
 %% 
 clear all
 close all
-clc
+clc 
 
 load('VAR_datakey.mat')
-tiere=inputdlg('Welche Tiere sollen in die Analyse eingeschlossen werden?','input',1,{'CG01 CG02 CG03 CG04 CG05 CG06 CG07'},'on');
+tiere=inputdlg('Welche Tiere sollen in die Analyse eingeschlossen werden?','input',1,{'CG01 CG02 CG03 CG04 CG05 CG06 CG07 CG08 CG09 CG10'},'on');
 tiere=strsplit(tiere{:})';
 TPs=inputdlg('Welche Zeitpunkte sollen eingeschlossen werden?','input',1,{'0 1 2 3 4 6 8 11 14 17 21 25 29 31'},'on');
-
+%TPs=inputdlg('Welche Zeitpunkte sollen eingeschlossen werden?','input',1,{'101 103 104 107 109 110 112 113 116 119 121 122 200 300 400 500'},'on');
 %paradigmata=inputdlg('Welche Paradigmen sollen eingeschlossen werden?','input',1,{'Ruhe LB10 LB20 LB30'},'on');
 %paradigmata=strsplit(paradigmata{:})';
 
@@ -65,10 +65,26 @@ clearvars  i
 all_requested_folders(1,:)=[];
 all_zugehoerige_animals(1,:)=[];
 
+if ~ispc
+    for i=1:size(all_requested_folders,1)
+        if str2num(all_requested_folders(i,3:4))<6
+
+            startordner(i,:)='/Volumes/A_guettlec/Primaerdaten/TBSI';
 
 
-for i=1:length(all_requested_folders)
-    ordner_i=[startordner '/' all_requested_folders(i,:)]
+        else
+            startordner(i,:)='/Volumes/B_guettlec/Primaerdaten/TBSI';
+        end
+
+    end
+else
+    for i=1:size(all_requested_folders,1)
+        startordner(i,:)=startordner(1,:);
+    end
+end
+
+for i=1:size(all_requested_folders,1)
+    ordner_i=[startordner(i,:) '/' all_requested_folders(i,:)]
     cd(ordner_i)
     ordner_i_einzelne_aufnahmen=(subdir)';
     ordner_i_einzelne_aufnahmen=strrep(ordner_i_einzelne_aufnahmen,'\','/');
@@ -169,10 +185,10 @@ for i=1:length(all_requested_folders)
 
                         cd ../
                         
-                        dateiname=sprintf('%s/%s_TP%02d_Rec%02d_Chop%02dof%02d',zielordner, ...
+                        dateiname=sprintf('%s/%s_TP%03d_Rec%02d_Chop%02dof%02d',zielordner, ...
                             all_zugehoerige_animals(i,:), all_zugehoerige_TP(i), einzelne_aufnahmen_i, ...
                             chopordner_i, number_of_chops);
-                        save(dateiname, 'data')
+                        save(dateiname, 'data', '-v7.3')
                         
                         
                         
@@ -253,13 +269,17 @@ for i=1:length(all_requested_folders)
                 dateiname=sprintf('%s/%s_TP%02d_Rec%02d',zielordner, ...
                     all_zugehoerige_animals(i,:), all_zugehoerige_TP(i), einzelne_aufnahmen_i);
                 
-                index_Ephysliste = find(ismember(Ephysliste, ordner_i_einzelne_aufnahmen{einzelne_aufnahmen_i}(end-30:end)));
+              
+                Indexhelp = strfind(Ephysliste, ordner_i_einzelne_aufnahmen{einzelne_aufnahmen_i}(end-30:end));
+                index_Ephysliste = find(not(cellfun('isempty', Indexhelp)));
+
                 datakey.key(index_Ephysliste).MAT_name  =sprintf('%s_TP%02d_Rec%02d', ...
                     all_zugehoerige_animals(i,:), all_zugehoerige_TP(i), einzelne_aufnahmen_i);      
                         
                         
                 
-                save(dateiname, 'data')
+                save(dateiname, 'data', '-v7.3')
+               
                 
                 
                 
