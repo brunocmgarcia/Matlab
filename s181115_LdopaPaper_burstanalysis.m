@@ -247,3 +247,148 @@ hold off
     hold off
     
     
+    
+%% vorgehen echtes script:
+%  nimm erst alle 10min dateien (500hz, no reref just m1.)
+%  gleiche artfkcorr wie in LDOPa paper1
+%  
+ 
+ 
+ clear all
+
+if ~ispc
+    cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/')
+else
+    cd('F:/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/')
+
+end
+cd('Ruhe10')
+ordner=dir('*.mat');
+files={ordner.name}';
+for file_i=1:length(files)
+datei=files(file_i);
+datei=datei{:}
+load(datei)
+ 
+cfg=[]; % notwendig?
+cfg.demean='yes'
+data=ft_preprocessing(cfg,data);
+
+cfg=[];
+cfg.artfctdef.zvalue.channel='30: M1';
+cfg.artfctdef.zvalue.cutoff      = 2.5;
+cfg.artfctdef.zvalue.trlpadding  = 0;
+cfg.artfctdef.zvalue.fltpadding  = 0;
+cfg.artfctdef.zvalue.artpadding  = 1;
+cfg.artfctdef.zvalue.bpfilter    = 'yes';
+cfg.artfctdef.zvalue.bpfreq      = [.1 8];
+cfg.artfctdef.zvalue.bpfiltord   = 3;
+cfg.artfctdef.zvalue.bpfilttype  = 'but';
+cfg.artfctdef.zvalue.hilbert     = 'yes';
+cfg.artfctdef.zvalue.boxcar      = 0.2;
+cfg.artfctdef.zvalue.interactive = 'yes';
+[cfg, zvalue] = ft_artifact_zvalue(cfg, data);
+cfg.artfctdef.reject='partial';
+data_processed = ft_rejectartifact(cfg, data);
+cfg=[];
+cfg.length=2;
+data_processed = ft_redefinetrial(cfg, data_processed);
+cfg=[];
+cfg.trl=data_processed.sampleinfo;
+cfg.trl(:,3)=0;
+cfg.artfctdef.threshold.range=400000;
+cfg.artfctdef.threshold.bpfilter  = 'no';
+cfg.artfctdef.threshold.bpfreq    = [0.3 30]
+cfg.artfctdef.threshold.bpfiltord = 4
+[cfg, threshold] = ft_artifact_threshold(cfg, data_processed);
+ 
+clearvars data_processed
+
+binaryartefactchannel=data.time{1,1}*0;
+for artefakt_i=1:size(zvalue,1) 
+    binaryartefactchannel(zvalue(artefakt_i,1):zvalue(artefakt_i,2))=1;
+end
+for artefakt_i=1:size(threshold,1)       
+    binaryartefactchannel(threshold(artefakt_i,1):threshold(artefakt_i,2))=1;  
+end
+clearvars artefakt_i
+
+% jetzt habe ich eine 0-1 timeline die mit den samples übereinstimmt.
+% 1=artefakt. Jetzt normales vorgehen zum burstfinden, erstmal mit
+% rect/smooth 
+
+%1: bp filtern
+cfg=[];
+cfg.bpfilter='yes';
+cfg.bpfreq=[85 130];
+cfg.bpfiltord=5;
+data=ft_preprocessing(cfg,data);
+
+%2: rectify
+cfg=[];
+cfg.rectify='yes';
+data=ft_preprocessing(cfg,data);
+
+%3: smoothing & discard artfkt episodes
+datrectsmooth=smoothdata(data.trial{1,1},2,'gaussian',(0.1*data.fsample));
+datrectsmooth(binaryartefactchannel==1)=NaN;
+
+% testeinschub, nachher entfernen!:
+%data.trial{1,1}=datrectsmooth;
+%call shortcut databrowser!
+%REMOVE!
+
+%4: berechnung p75
+P75rs=prctile(datrectsmooth,75);
+P75rs_curve=((ones(length(datrectsmooth),1)*P75rs)');
+P75rs_curve(P75rs_curve>=datrectsmooth)=NaN;
+rs_ueberthreshold           = diff( ~isnan([ NaN P75rs_curve NaN ]) );
+rs_NumBlockStart   = find( rs_ueberthreshold>0 )-0;
+rs_NumBlockEnd     = find( rs_ueberthreshold<0 )-1;
+rs_NumBlockLength  = (rs_NumBlockEnd - rs_NumBlockStart + 1)/data.fsample;
+
+datrectsmoothsub=datrectsmooth-P75rs;
+datrectsmoothsub(datrectsmoothsub<=0)=0;
+
+%5 visualisieren
+figure
+
+
+subplot(2,1,1)
+title('rote linie == 75ste percentile des blauen signals')
+axis tight
+hold on
+dat=data.trial{1,1}
+plot(data.trial{1,1}(1:1500),'Color', 'black')
+plot(1:1500,zeros(1500,1)', 'black')
+title('Rohdaten (gefiltert)')
+hold off
+
+subplot(2,1,2)
+axis tight
+hold on
+plot(dat,'Color', 'black')
+plot(datrectsmooth(1:1500), 'Color', 'b')
+plot(1:1500,zeros(1500,1)', 'black')
+plot(1:1500,P75rs_curve(1:1500), 'Color', 'r')
+title('rectified+smoothed')
+hold off
+
+figure
+subplot(2,4,1:4)
+hold on
+jbfill(1:length(datrectsmoothsub),datrectsmoothsub,zeros(length(datrectsmoothsub),1)')
+title('rectified+smoothed')
+hold off
+
+
+subplot(2,4,5:6)
+    hold on
+    histogram(rs_NumBlockLength, 0:0.01:0.4, 'Normalization', 'probability')
+ %   ksdensity(rs_NumBlockLength)
+    title('rectified & smooth')
+    xlim([0 0.4])
+    hold off
+
+end
+ 
