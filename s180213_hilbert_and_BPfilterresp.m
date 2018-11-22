@@ -81,7 +81,7 @@ figure('Name','Distribution of suprathreshold Period lengths')
 histolength=histogram(NumBlockLength, [.1 .2 .3 .4 .5 .6 .7 .8 .9 inf],'Normalization', 'probability');
 figure('Name','Distribution of suprathreshold AUC(data) - AUC(percentile)')
 histoarea=histogram(AreaUnderCurve, 'Normalization', 'probability');
-%% statt histogram jetzt mal kernel density function https://en.wikipedia.org/wiki/Kernel_density_estimation
+% statt histogram jetzt mal kernel density function https://en.wikipedia.org/wiki/Kernel_density_estimation
 % mit ansteigendem bandwidth
 for i=0.01:0.01:0.2
     figure
