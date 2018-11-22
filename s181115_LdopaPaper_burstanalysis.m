@@ -262,16 +262,16 @@ else
     cd('F:/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/')
 
 end
-cd('Ruhe10')
+cd('180')
 ordner=dir('*.mat');
 files={ordner.name}';
-for file_i=11%:length(files)
+for file_i=14%:length(files)
 datei=files(file_i);
 datei=datei{:}
 load(datei)
  
 cfg=[]; 
-cfg.demean='yes'
+cfg.demean='yes';
 data=ft_preprocessing(cfg,data);
 
 cfg=[];
@@ -323,7 +323,7 @@ cfg.bpfilter='yes';
 cfg.bpfreq=[85 130];
 cfg.bpfiltord=5;
 data=ft_preprocessing(cfg,data);
-
+orig_data=data;
 %2: rectify
 cfg=[];
 cfg.rectify='yes';
@@ -341,6 +341,7 @@ datrectsmooth(binaryartefactchannel==1)=NaN;
 
 %4: berechnung p75
 P75rs=prctile(datrectsmooth,75);
+P75rs=0.8e4;
 P75rs_curve=((ones(length(datrectsmooth),1)*P75rs)');
 P75rs_curve(P75rs_curve>=datrectsmooth)=NaN;
 rs_ueberthreshold           = diff( ~isnan([ NaN P75rs_curve NaN ]) );
@@ -352,44 +353,81 @@ datrectsmoothsub=datrectsmooth-P75rs;
 datrectsmoothsub(datrectsmoothsub<=0)=0;
 
 %5 visualisieren
-figure
+h=figure('Units', 'normalized', 'Position', [0 0 1 1]);
 
 
-subplot(2,1,1)
+s1=subplot(4,4,1:4);
 title('rote linie == 75ste percentile des blauen signals')
 axis tight
 hold on
-dat=data.trial{1,1}
-plot(data.trial{1,1}(1:1500),'Color', 'black')
-plot(1:1500,zeros(1500,1)', 'black')
+
+plot(orig_data.trial{1,1},'Color', 'black')
+plot(1:length(orig_data.trial{1,1}),zeros(length(orig_data.trial{1,1}),1)', 'black')
 title('Rohdaten (gefiltert)')
+xlim([1 1500])
+ylim([-3e4 3e4])
 hold off
 
-subplot(2,1,2)
+s2=subplot(4,4,5:8);
 axis tight
 hold on
-plot(dat,'Color', 'black')
-plot(datrectsmooth(1:1500), 'Color', 'b')
-plot(1:1500,zeros(1500,1)', 'black')
-plot(1:1500,P75rs_curve(1:1500), 'Color', 'r')
+plot(orig_data.trial{1,1},'Color', 'black')
+plot(datrectsmooth, 'Color', 'b')
+plot(1:length(orig_data.trial{1,1}),zeros(length(orig_data.trial{1,1}),1)', 'black')
+plot(1:length(orig_data.trial{1,1}),P75rs_curve(1:length(orig_data.trial{1,1})), 'Color', 'r')
 title('rectified+smoothed')
+xlim([1 1500])
+ylim([-3e4 3e4])
+
 hold off
 
-figure
-subplot(2,4,1:4)
+
+s3=subplot(4,4,9:12);
 hold on
-jbfill(1:length(datrectsmoothsub),datrectsmoothsub,zeros(length(datrectsmoothsub),1)')
+jbdatrectsmoothsub=datrectsmoothsub;
+jbdatrectsmoothsub(isnan(jbdatrectsmoothsub))=0;
+jbfill(1:length(jbdatrectsmoothsub),jbdatrectsmoothsub,zeros(length(jbdatrectsmoothsub),1)');
 title('rectified+smoothed')
+xlim([1 1500])
+ylim([0 2e4])
+
 hold off
 
 
-subplot(2,4,5:6)
+s4=subplot(4,4,13:14);
     hold on
-    histogram(rs_NumBlockLength, 0:0.01:0.4, 'Normalization', 'probability')
+    histogram(rs_NumBlockLength, 0:0.01:0.4, 'Normalization', 'probability');
  %   ksdensity(rs_NumBlockLength)
     title('rectified & smooth')
     xlim([0 0.4])
     hold off
+s5=subplot(4,4,16);
+set(s5, 'visible', 'off');
+%end
 
-end
- 
+
+% 20/sekunde
+% ganze video soll aber in 3min durchsein --> 3fach speed.
+% fs ist 500 -> 500 punkte sind 1s.
+% also muss es mit 1500 punkten pro sekunde durchlaufen.
+% davon aber nur 20 behalten. also immer 75 weiter
+
+% for i=1:5:4500%length(jbdatrectsmoothsub)-75
+%     cla(s5)
+%     s1.XLim=[i i+1500];
+%     s2.XLim=[i i+1500];
+%     s3.XLim=[i i+1500];
+%     subplot(s5);
+%     text(0.5,0.5,[num2str(i/500, '%.2f') ' Sekunden']);
+%     
+%     drawnow
+%     frame=getframe(h);
+%     im=frame2im(frame);
+%     [imind,cm]=rgb2ind(im,256);
+%     if i==1
+%         imwrite(imind,cm,'/Users/guettlec/Desktop/test.gif','gif','Loopcount',inf, 'DelayTime', 0.01);
+%     else
+%         imwrite(imind,cm,'/Users/guettlec/Desktop/test.gif','gif','Writemode','append', 'DelayTime', 0.01);
+%     end   
+% end
+%     
