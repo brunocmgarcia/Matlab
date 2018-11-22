@@ -4,20 +4,22 @@ clear all
 close all
 clc
 set(0, 'DefaultTextInterpreter', 'none')
-cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/01_AppendChannel_fs1000_LP450')
-zielfolder='/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/03_connectivity/';
-dropboxfolder='/';
+cd('F:\Auswertung\00_LDopa_Paper\01_AppendChannel_fs1000_LP450')
+zielfolder='F:\Auswertung\00_LDopa_Paper\03_connectivity\striatum\';
+dropboxfolder='C:\Users\guettlec\Dropbox\wpli_img\striatum\';
 ordner=dir('*.mat');
 files={ordner.name}';
 clearvars ordner
 fehler=0;
-min180aufnahmen = find(contains(files,'180'));
+IndexC = strfind(files, '180');
+min180aufnahmen = find(not(cellfun('isempty', IndexC)));
+
 for file_i=min180aufnahmen' %% alle 180min Ldopaaufnahmen
     file=files(file_i);
     dateiname=file{:};
     load(dateiname)
-    try
-        cfg.channel=data.label([16:29 30]); 
+   try
+        cfg.channel=data.label([1:15 30]); 
         channelcombinations=cfg.channel(1:end-1);
         channelcombinations(1:end,2) = cfg.channel(end);    
         data=ft_selectdata(cfg,data);    
@@ -136,14 +138,14 @@ for file_i=min180aufnahmen' %% alle 180min Ldopaaufnahmen
         title(dateiname)
 
 
-        saveas(fig_allcomb,[zielfolder dateiname(1:end-4) '_SNR_WPLI_allcomb.png']);
-        saveas(fig_average,[zielfolder dateiname(1:end-4) '_SNR_WPLI_average.png']);
-        saveas(fig_allcomb,[dropboxfolder dateiname(1:end-4) '_SNR_WPLI_allcomb.png']);
-        saveas(fig_average,[dropboxfolder dateiname(1:end-4) '_SNR_WPLI_average.png']);
+        saveas(fig_allcomb,[zielfolder dateiname(1:end-4) '_STR_WPLI_allcomb.png']);
+        saveas(fig_average,[zielfolder dateiname(1:end-4) '_STR_WPLI_average.png']);
+        saveas(fig_allcomb,[dropboxfolder dateiname(1:end-4) '_STR_WPLI_allcomb.png']);
+        saveas(fig_average,[dropboxfolder dateiname(1:end-4) '_STR_WPLI_average.png']);
         save([zielfolder dateiname(1:end-4) 'freqAndWPLI.mat'], 'freq', 'fd', 'roughtrialtimes');
-    catch
-        fehler(file_i)=1;
-    end
+   catch
+       fehler(file_i)=1;
+   end
     clearvars -except file_i files zielfolder dropboxfolder fehler
     close all
 end
