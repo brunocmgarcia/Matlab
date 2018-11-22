@@ -265,12 +265,12 @@ end
 cd('Ruhe10')
 ordner=dir('*.mat');
 files={ordner.name}';
-for file_i=1:length(files)
+for file_i=11%:length(files)
 datei=files(file_i);
 datei=datei{:}
 load(datei)
  
-cfg=[]; % notwendig?
+cfg=[]; 
 cfg.demean='yes'
 data=ft_preprocessing(cfg,data);
 
@@ -286,7 +286,7 @@ cfg.artfctdef.zvalue.bpfiltord   = 3;
 cfg.artfctdef.zvalue.bpfilttype  = 'but';
 cfg.artfctdef.zvalue.hilbert     = 'yes';
 cfg.artfctdef.zvalue.boxcar      = 0.2;
-cfg.artfctdef.zvalue.interactive = 'yes';
+cfg.artfctdef.zvalue.interactive = 'no';
 [cfg, zvalue] = ft_artifact_zvalue(cfg, data);
 cfg.artfctdef.reject='partial';
 data_processed = ft_rejectartifact(cfg, data);
@@ -329,7 +329,8 @@ cfg=[];
 cfg.rectify='yes';
 data=ft_preprocessing(cfg,data);
 
-%3: smoothing & discard artfkt episodes
+%3: smoothing & discard artfkt episodes CAVE GEHT NUR MIT SIGNAL PROCESSING
+%TOOLBOX
 datrectsmooth=smoothdata(data.trial{1,1},2,'gaussian',(0.1*data.fsample));
 datrectsmooth(binaryartefactchannel==1)=NaN;
 
