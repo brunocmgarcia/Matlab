@@ -249,12 +249,11 @@
     
     
 %% vorgehen echtes script:
-%  nimm erst alle 10min dateien (500hz, no reref just m1.)
-%  gleiche artfkcorr wie in LDOPa paper1
-%  
- 
- 
- clear all
+%  erst die 10min dateien
+
+clear all
+ close all 
+ clc
 
 if ~ispc
     cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/')
@@ -265,118 +264,275 @@ end
 cd('Ruhe10')
 ordner=dir('*.mat');
 files={ordner.name}';
-for file_i=14%:length(files)
-datei=files(file_i);
-datei=datei{:}
-load(datei)
- 
-cfg=[]; 
-cfg.demean='yes';
-data=ft_preprocessing(cfg,data);
+for file_i=1:length(files)    
+    datei=files(file_i);
+    datei=datei{:}
+   
+    load(datei)
+    cfg=[]; 
+    cfg.demean='yes';
+    data=ft_preprocessing(cfg,data);
 
-load(['artdefs/' datei])
+    load(['artdefs/' datei])
 
-binaryartefactchannel=data.time{1,1}*0;
-for artefakt_i=1:size(zvalue,1) 
-    binaryartefactchannel(zvalue(artefakt_i,1):zvalue(artefakt_i,2))=1;
-end
-for artefakt_i=1:size(threshold,1)       
-    binaryartefactchannel(threshold(artefakt_i,1):threshold(artefakt_i,2))=1;  
-end
-clearvars artefakt_i
+    binaryartefactchannel=data.time{1,1}*0;
+    for artefakt_i=1:size(zvalue,1) 
+        binaryartefactchannel(zvalue(artefakt_i,1):zvalue(artefakt_i,2))=1;
+    end
+    for artefakt_i=1:size(threshold,1)       
+        binaryartefactchannel(threshold(artefakt_i,1):threshold(artefakt_i,2))=1;  
+    end
+    clearvars artefakt_i
 
-% jetzt habe ich eine 0-1 timeline die mit den samples übereinstimmt.
-% 1=artefakt. Jetzt normales vorgehen zum burstfinden, erstmal mit
-% rect/smooth 
+    % jetzt habe ich eine 0-1 timeline die mit den samples übereinstimmt.
+    % 1=artefakt. Jetzt normales vorgehen zum burstfinden, erstmal mit
+    % rect/smooth 
 
-%1: bp filtern
-cfg=[];
-cfg.bpfilter='yes';
-cfg.bpfreq=[85 130];
-cfg.bpfiltord=5;
-data=ft_preprocessing(cfg,data);
-orig_data=data;
-%2: rectify
-cfg=[];
-cfg.rectify='yes';
-data=ft_preprocessing(cfg,data);
+    %1: bp filtern
+    cfg=[];
+    cfg.bpfilter='yes';
+    cfg.bpfreq=[80 130];
+    cfg.bpfiltord=5;
+    data=ft_preprocessing(cfg,data);
+    orig_data=data;
+    %2: rectify
+    cfg=[];
+    cfg.rectify='yes';
+    %cfg.hilbert='yes'; % abs ist standard
+    data=ft_preprocessing(cfg,data);
+    
+    
+  
+    
+    
+    
+    
+    %3: smoothing & discard artfkt episodes CAVE GEHT NUR MIT SIGNAL PROCESSING
+    %TOOLBOX
+    datrectsmooth=smoothdata(data.trial{1,1},2,'gaussian',(0.1*data.fsample));
+    %datrectsmooth=data.trial{1,1};
+    datrectsmooth(binaryartefactchannel==1)=NaN;
 
-%3: smoothing & discard artfkt episodes CAVE GEHT NUR MIT SIGNAL PROCESSING
-%TOOLBOX
-datrectsmooth=smoothdata(data.trial{1,1},2,'gaussian',(0.1*data.fsample));
+    %4: berechnung p75
+    P75rs=prctile(datrectsmooth,75);
+    P75rs_curve=((ones(length(datrectsmooth),1)*P75rs)');
+    datrectsmooth(isnan(datrectsmooth))=0; % mit NaN würde der nächste schritt nicht funktionieren
+    P75rs_curve(P75rs_curve>=datrectsmooth)=NaN;
+    rs_ueberthreshold           = diff( ~isnan([ NaN P75rs_curve NaN ]) );
+    rs_NumBlockStart   = find( rs_ueberthreshold>0 )-0;
+    rs_NumBlockEnd     = find( rs_ueberthreshold<0 )-1;
+    rs_NumBlockLength  = (rs_NumBlockEnd - rs_NumBlockStart + 1)/data.fsample;
+   
+    
+    datrectsmoothsub=datrectsmooth-P75rs;
+    datrectsmoothsub(datrectsmoothsub<=0)=0;
 
+    ausschnitt=orig_data.trial{1,1}(rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))...
+        :rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))+1500);
 
-%%
-datrectsmooth(binaryartefactchannel==1)=NaN;
-
-% testeinschub, nachher entfernen!:
-%data.trial{1,1}=datrectsmooth;
-%call shortcut databrowser!
-%REMOVE!
-
-%4: berechnung p75
-P75rs=prctile(datrectsmooth,75);
-P75rs_curve=((ones(length(datrectsmooth),1)*P75rs)');
-P75rs_curve(P75rs_curve>=datrectsmooth)=NaN;
-rs_ueberthreshold           = diff( ~isnan([ NaN P75rs_curve NaN ]) );
-rs_NumBlockStart   = find( rs_ueberthreshold>0 )-0;
-rs_NumBlockEnd     = find( rs_ueberthreshold<0 )-1;
-rs_NumBlockLength  = (rs_NumBlockEnd - rs_NumBlockStart + 1)/data.fsample;
-
-datrectsmoothsub=datrectsmooth-P75rs;
-datrectsmoothsub(datrectsmoothsub<=0)=0;
-
-%5 visualisieren
-h=figure('Units', 'normalized', 'Position', [0 0 1 1]);
-
-
-s1=subplot(4,4,1:4);
-title('rote linie == 75ste percentile des blauen signals')
-axis tight
-hold on
-
-plot(orig_data.trial{1,1},'Color', 'black')
-plot(1:length(orig_data.trial{1,1}),zeros(length(orig_data.trial{1,1}),1)', 'black')
-title('Rohdaten (gefiltert)')
-xlim([1 1500])
-ylim([-3e4 3e4])
-hold off
-
-s2=subplot(4,4,5:8);
-axis tight
-hold on
-plot(orig_data.trial{1,1},'Color', 'black')
-plot(datrectsmooth, 'Color', 'b')
-plot(1:length(orig_data.trial{1,1}),zeros(length(orig_data.trial{1,1}),1)', 'black')
-plot(1:length(orig_data.trial{1,1}),P75rs_curve(1:length(orig_data.trial{1,1})), 'Color', 'r')
-title('rectified+smoothed')
-xlim([1 1500])
-ylim([-3e4 3e4])
-
-hold off
+    %5 visualisieren
+    h=figure('Units', 'normalized', 'Position', [0 0 1 1]);
 
 
-s3=subplot(4,4,9:12);
-hold on
-jbdatrectsmoothsub=datrectsmoothsub;
-jbdatrectsmoothsub(isnan(jbdatrectsmoothsub))=0;
-jbfill(1:length(jbdatrectsmoothsub),jbdatrectsmoothsub,zeros(length(jbdatrectsmoothsub),1)');
-title('rectified+smoothed')
-xlim([1 1500])
-ylim([0 2e4])
-
-hold off
-
-
-s4=subplot(4,4,13:14);
+    s1=subplot(4,4,1:4);
+    title('rote linie == 75ste percentile des blauen signals')
+    axis tight
     hold on
-    histogram(rs_NumBlockLength, 0:0.01:0.4, 'Normalization', 'probability');
- %   ksdensity(rs_NumBlockLength)
-    title('rectified & smooth')
-    xlim([0 0.4])
+
+    plot(ausschnitt,'Color', 'black')
+    plot(1:length(ausschnitt),zeros(length(ausschnitt),1)', 'black')
+    title('Rohdaten (gefiltert)')
+
+    ylim([-3e4 3e4])
     hold off
-s5=subplot(4,4,16);
-set(s5, 'visible', 'off');
+
+    s2=subplot(4,4,5:8);
+    axis tight
+    hold on
+    plot(ausschnitt,'Color', 'black')
+    plot(datrectsmooth(rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2)):rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))+1500), 'Color', 'b')
+    plot(1:length(ausschnitt),zeros(length(ausschnitt),1)', 'black')
+    plot(1:length(ausschnitt),P75rs_curve(rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2)):rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))+1500), 'Color', 'r')
+    title('rectified+smoothed')
+
+    ylim([-3e4 3e4])
+
+    hold off
+
+
+    s3=subplot(4,4,9:12);
+    hold on
+    jbdatrectsmoothsub=datrectsmoothsub;
+    jbdatrectsmoothsub(isnan(jbdatrectsmoothsub))=0;
+    jbfill(1:1500,jbdatrectsmoothsub((rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))):rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))+1499),zeros(1500,1)');
+    title('rectified+smoothed')
+
+    ylim([0 2e4])
+
+    hold off
+
+
+    s4=subplot(4,4,13:14);
+        hold on
+        myhist=histogram(rs_NumBlockLength, 0:0.05:0.6, 'Normalization', 'probability');
+     %   ksdensity(rs_NumBlockLength)
+        title('rectified & smooth')
+        xlim([0 0.4])
+        hold off
+    s5=subplot(4,4,16);
+    set(s5, 'visible', 'off');
+    saveas(gcf,['burst/' datei(1:end-4) '_burst.png']);
+    savefig(['burst/' datei(1:end-4) '_burst'])
+    save(['burst/' datei(1:end-4) '_burst.mat'], 'rs_NumBlockStart','rs_NumBlockEnd','rs_NumBlockLength','P75rs','myhist','datrectsmooth');
+    close all
+    
+end
+
+
+%% jetzt die 180min dateien
+
+
+
+ 
+ clear all
+ close all 
+ clc
+ load VAR_baselineschluessel
+
+if ~ispc
+    cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/')
+else
+    cd('F:/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/')
+
+end
+cd('180')
+ordner=dir('*.mat');
+files={ordner.name}';
+for file_i=1:length(files)    
+    datei=files(file_i);
+    datei=datei{:}
+    baselinedat=baselineschluessel(file_i,2);
+    if ~isempty(baselinedat{:})
+    baselinedat=baselinedat{:}(1:end-18);
+    baselinedat=[baselinedat '_burst.mat']
+    load(datei)
+    basestruct=load(['/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/Ruhe10/burst/' baselinedat]);
+    P75rs=basestruct.P75rs;
+    cfg=[]; 
+    cfg.demean='yes';
+    data=ft_preprocessing(cfg,data);
+
+    load(['artdefs/' datei])
+
+    binaryartefactchannel=data.time{1,1}*0;
+    for artefakt_i=1:size(zvalue,1) 
+        binaryartefactchannel(zvalue(artefakt_i,1):zvalue(artefakt_i,2))=1;
+    end
+    for artefakt_i=1:size(threshold,1)       
+        binaryartefactchannel(threshold(artefakt_i,1):threshold(artefakt_i,2))=1;  
+    end
+    clearvars artefakt_i
+
+    % jetzt habe ich eine 0-1 timeline die mit den samples übereinstimmt.
+    % 1=artefakt. Jetzt normales vorgehen zum burstfinden, erstmal mit
+    % rect/smooth 
+
+    %1: bp filtern
+    cfg=[];
+    cfg.bpfilter='yes';
+    cfg.bpfreq=[80 130];
+    cfg.bpfiltord=5;
+    data=ft_preprocessing(cfg,data);
+    orig_data=data;
+    %2: rectify
+    cfg=[];
+    cfg.rectify='yes';
+    %cfg.hilbert='yes';
+    data=ft_preprocessing(cfg,data);
+
+    %3: smoothing & discard artfkt episodes CAVE GEHT NUR MIT SIGNAL PROCESSING
+    %TOOLBOX
+    datrectsmooth=smoothdata(data.trial{1,1},2,'gaussian',(0.1*data.fsample));
+    %datrectsmooth=data.trial{1,1};
+
+    %%
+    datrectsmooth(binaryartefactchannel==1)=NaN;
+
+   
+
+    %4: berechnung p75
+    % P75rs=prctile(datrectsmooth,75); % --> übernahme aus BL dateien
+    P75rs_curve=((ones(length(datrectsmooth),1)*P75rs)');
+    datrectsmooth(isnan(datrectsmooth))=0;
+    P75rs_curve(P75rs_curve>=datrectsmooth)=NaN;
+    rs_ueberthreshold           = diff( ~isnan([ NaN P75rs_curve NaN ]) );
+    rs_NumBlockStart   = find( rs_ueberthreshold>0 )-0;
+    rs_NumBlockEnd     = find( rs_ueberthreshold<0 )-1;
+    rs_NumBlockLength  = (rs_NumBlockEnd - rs_NumBlockStart + 1)/data.fsample;
+    rs_NumBlockLength = rs_NumBlockLength(rs_NumBlockStart>(3000*data.fsample) & rs_NumBlockEnd <(7800*data.fsample));
+    
+    datrectsmoothsub=datrectsmooth-P75rs;
+    datrectsmoothsub(datrectsmoothsub<=0)=0;
+
+    ausschnitt=orig_data.trial{1,1}(rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))...
+        :rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))+1500);
+
+    %5 visualisieren
+    h=figure('Units', 'normalized', 'Position', [0 0 1 1]);
+
+
+    s1=subplot(4,4,1:4);
+    title('rote linie == 75ste percentile des blauen signals')
+    axis tight
+    hold on
+
+    plot(ausschnitt,'Color', 'black')
+    plot(1:length(ausschnitt),zeros(length(ausschnitt),1)', 'black')
+    title('Rohdaten (gefiltert)')
+
+    ylim([-3e4 3e4])
+    hold off
+
+    s2=subplot(4,4,5:8);
+    axis tight
+    hold on
+    plot(ausschnitt,'Color', 'black')
+    plot(datrectsmooth(rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2)):rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))+1500), 'Color', 'b')
+    plot(1:length(ausschnitt),zeros(length(ausschnitt),1)', 'black')
+    plot(1:length(ausschnitt),P75rs_curve(rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2)):rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))+1500), 'Color', 'r')
+    title('rectified+smoothed')
+
+    ylim([-3e4 3e4])
+
+    hold off
+
+
+    s3=subplot(4,4,9:12);
+    hold on
+    jbdatrectsmoothsub=datrectsmoothsub;
+    jbdatrectsmoothsub(isnan(jbdatrectsmoothsub))=0;
+    jbfill(1:1500,jbdatrectsmoothsub((rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))):rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))+1499),zeros(1500,1)');
+    title('rectified+smoothed')
+
+    ylim([0 2e4])
+
+    hold off
+
+
+    s4=subplot(4,4,13:14);
+        hold on
+        myhist=histogram(rs_NumBlockLength, 0:0.05:0.6, 'Normalization', 'probability');
+     %   ksdensity(rs_NumBlockLength)
+        title('rectified & smooth')
+        %xlim([0 0.4])
+        hold off
+    s5=subplot(4,4,16);
+    set(s5, 'visible', 'off');
+    saveas(gcf,['burst/' datei(1:end-4) '_burst.png']);
+    savefig(['burst/' datei(1:end-4) '_burst'])
+    save(['burst/' datei(1:end-4) '_burst.mat'], 'rs_NumBlockStart','rs_NumBlockEnd','rs_NumBlockLength','P75rs','myhist','datrectsmooth');
+    close all
+    end
 end
 
 
