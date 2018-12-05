@@ -254,6 +254,20 @@
 clear all
  close all 
  clc
+ 
+load VAR_baselineschluessel
+
+
+cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN/fooofed/MAT_processed')
+load results
+
+masterpeakfreq=results.masterpeakfreq;
+masterpeakfreq=masterpeakfreq(10:end,:);
+masterpeakfreq=nanmedian(masterpeakfreq(:,5:6),2);
+
+clearvars results
+
+baselineschluessel=baselineschluessel(10:end,:);
 
 if ~ispc
     cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/')
@@ -262,11 +276,14 @@ else
 
 end
 cd('Ruhe10')
-ordner=dir('*.mat');
-files={ordner.name}';
-for file_i=1:length(files)    
-    datei=files(file_i);
-    datei=datei{:}
+
+
+
+
+for file_i=1:length(baselineschluessel)    
+    datei=baselineschluessel(file_i,2);
+    datei=[datei{:}(1:end-18) '.mat']
+    
    
     load(datei)
     cfg=[]; 
@@ -291,7 +308,7 @@ for file_i=1:length(files)
     %1: bp filtern
     cfg=[];
     cfg.bpfilter='yes';
-    cfg.bpfreq=[80 130];
+    cfg.bpfreq=[masterpeakfreq(file_i)-5 masterpeakfreq(file_i)+5];
     cfg.bpfiltord=5;
     data=ft_preprocessing(cfg,data);
     orig_data=data;
@@ -385,7 +402,7 @@ for file_i=1:length(files)
     savefig(['burst/' datei(1:end-4) '_burst'])
     save(['burst/' datei(1:end-4) '_burst.mat'], 'rs_NumBlockStart','rs_NumBlockEnd','rs_NumBlockLength','P75rs','myhist','datrectsmooth');
     close all
-    
+    clearvars -except baselineschluessel file_i masterpeakfreq
 end
 
 
@@ -398,6 +415,14 @@ end
  close all 
  clc
  load VAR_baselineschluessel
+ baselineschluessel=baselineschluessel(10:end,:);
+ cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN/fooofed/MAT_processed')
+  load results
+
+masterpeakfreq=results.masterpeakfreq;
+masterpeakfreq=masterpeakfreq(10:end,:);
+masterpeakfreq=nanmedian(masterpeakfreq(:,4:7),2);
+clearvars results
 
 if ~ispc
     cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/')
@@ -406,11 +431,11 @@ else
 
 end
 cd('180')
-ordner=dir('*.mat');
-files={ordner.name}';
-for file_i=1:length(files)    
-    datei=files(file_i);
-    datei=datei{:}
+
+for file_i=1:length(baselineschluessel)    
+    datei=baselineschluessel(file_i,1);
+    datei=[datei{:}(1:end-18) '.mat']
+    load(datei)
     baselinedat=baselineschluessel(file_i,2);
     if ~isempty(baselinedat{:})
     baselinedat=baselinedat{:}(1:end-18);
@@ -440,7 +465,7 @@ for file_i=1:length(files)
     %1: bp filtern
     cfg=[];
     cfg.bpfilter='yes';
-    cfg.bpfreq=[80 130];
+    cfg.bpfreq=[masterpeakfreq(file_i)-5 masterpeakfreq(file_i)+5];
     cfg.bpfiltord=5;
     data=ft_preprocessing(cfg,data);
     orig_data=data;
@@ -467,9 +492,14 @@ for file_i=1:length(files)
     P75rs_curve(P75rs_curve>=datrectsmooth)=NaN;
     rs_ueberthreshold           = diff( ~isnan([ NaN P75rs_curve NaN ]) );
     rs_NumBlockStart   = find( rs_ueberthreshold>0 )-0;
+    rs_NumBlockStartold=rs_NumBlockStart;
     rs_NumBlockEnd     = find( rs_ueberthreshold<0 )-1;
+    rs_NumBlockEndold=rs_NumBlockEnd;
     rs_NumBlockLength  = (rs_NumBlockEnd - rs_NumBlockStart + 1)/data.fsample;
-    rs_NumBlockLength = rs_NumBlockLength(rs_NumBlockStart>(3000*data.fsample) & rs_NumBlockEnd <(7800*data.fsample));
+    rs_NumBlockLengthold=rs_NumBlockLength;
+    rs_NumBlockStart = rs_NumBlockStart(rs_NumBlockStartold>(3000*data.fsample) & rs_NumBlockEndold <(7800*data.fsample));
+    rs_NumBlockEnd = rs_NumBlockEnd(rs_NumBlockStartold>(3000*data.fsample) & rs_NumBlockEndold <(7800*data.fsample));
+    rs_NumBlockLength = rs_NumBlockLength(rs_NumBlockStartold>(3000*data.fsample) & rs_NumBlockEndold <(7800*data.fsample));%(7800*data.fsample));
     
     datrectsmoothsub=datrectsmooth-P75rs;
     datrectsmoothsub(datrectsmoothsub<=0)=0;
@@ -530,9 +560,10 @@ for file_i=1:length(files)
     set(s5, 'visible', 'off');
     saveas(gcf,['burst/' datei(1:end-4) '_burst.png']);
     savefig(['burst/' datei(1:end-4) '_burst'])
-    save(['burst/' datei(1:end-4) '_burst.mat'], 'rs_NumBlockStart','rs_NumBlockEnd','rs_NumBlockLength','P75rs','myhist','datrectsmooth');
+    save(['burst/' datei(1:end-4) '_burst.mat'], 'rs_NumBlockStart','rs_NumBlockEnd','rs_NumBlockLength','P75rs','myhist','datrectsmooth', 'rs_NumBlockStartold','rs_NumBlockEndold','rs_NumBlockLengthold');
     close all
     end
+    clearvars -except baselineschluessel file_i masterpeakfreq 
 end
 
 

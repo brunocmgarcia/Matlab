@@ -39,13 +39,31 @@ close all
 clearvars -except totalp75_10 totalp75_180 totalbinprob180 histogram_einstellung_norm histogram_einstellung totalbinprob10 files file_i baselineschluessel
 end
 
+excludeanimals1=find(contains(baselineschluessel(:,1),'CG05'));
+excludeanimals2=find(contains(baselineschluessel(:,1),'CG09'));
+excludeanimals=[excludeanimals1; excludeanimals2];
+
 TP101=find(contains(baselineschluessel(:,1),'101'));
+TP101=setdiff(TP101,excludeanimals);
+
 TP104=find(contains(baselineschluessel(:,1),'104'));
+TP104=setdiff(TP104,excludeanimals);
+
 TP110=find(contains(baselineschluessel(:,1),'110'));
+TP110=setdiff(TP110,excludeanimals);
+
 TP116=find(contains(baselineschluessel(:,1),'116'));
+TP116=setdiff(TP116,excludeanimals);
+
 TP121=find(contains(baselineschluessel(:,1),'121'));
+TP121=setdiff(TP121,excludeanimals);
+
 TP300=find(contains(baselineschluessel(:,1),'300'));
+TP300=setdiff(TP300,excludeanimals);
+
 TP400=find(contains(baselineschluessel(:,1),'400'));
+TP400=setdiff(TP400,excludeanimals);
+
 
 length(TP101);
 
