@@ -37,7 +37,7 @@ end
 
 ordner=dir('*.mat');
 files={ordner.name}';
-for file_i=10:14%length(files)
+for file_i=1:length(files)
     
     datei=files(file_i);
     datei=datei{:}
@@ -169,7 +169,8 @@ for file_i=10:14%length(files)
         title(datei(1:end-4))
 
     cd TFRsWithNaN
-    save([datei(1:end-4) 'TFRhannArtCorr.mat'],'TFRhann', 'spektral')  
+    save([datei(1:end-4) '_TFRhannArtCorr.mat'],'TFRhann', 'spektral')
+    save([datei(1:end-4) '_ArtTimes.mat'],'zvalue', 'threshold')
     saveas(gcf,[datei(1:end-4) '.png'])
     cd ..
 
@@ -193,7 +194,7 @@ if ~exist([cd '/TFRsWithNaN'],'dir')
 end
 ordner=dir('*.mat');
 files={ordner.name}';
-for file_i=[13 36]%1:length(files)
+for file_i=1:length(files)
     
     datei=files(file_i);
     datei=datei{:}
@@ -325,7 +326,8 @@ for file_i=[13 36]%1:length(files)
         title(datei(1:end-4))
 
     cd TFRsWithNaN
-    save([datei(1:end-4) 'TFRhannArtCorr.mat'],'TFRhann', 'spektral')  
+    save([datei(1:end-4) 'TFRhannArtCorr.mat'],'TFRhann', 'spektral') 
+    save([datei(1:end-4) '_ArtTimes.mat'],'zvalue', 'threshold')
     saveas(gcf,[datei(1:end-4) '.png'])
     cd ..
 
