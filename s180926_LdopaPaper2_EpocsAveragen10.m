@@ -5,7 +5,9 @@
 
 clear all
 cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/Ruhe10/TFRsWithNaN')
-
+if ~exist([cd '/prefoofed'],'dir')
+    mkdir('prefooofed');
+end
 
 
 ordner=dir('*.mat');
@@ -16,7 +18,7 @@ for file_i=1:length(files)
     file=files(file_i);
     dateiname=file{:};
     load(dateiname)
-    my_foi=0.5:1:140;
+    my_foi=1:1:140;
 
 
 
