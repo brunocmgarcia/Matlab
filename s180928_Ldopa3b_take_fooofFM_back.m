@@ -1,6 +1,6 @@
-%% Ldopa3: nimmt die gefoooften datein zurück.
+%% Ldopa3: nimmt die gefoooften datein zurï¿½ck.
 %output: jeweils eine figure mit original powspctr, gauss model, flat.
-% flat als lineartransform. dann baseline (flat) abziehen. zusätzlich am schluss eine csv für
+% flat als lineartransform. dann baseline (flat) abziehen. zusï¿½tzlich am schluss eine csv fï¿½r
 %peaks und linpeak AUC sowie txt liste aller datei namen um am schluss ein
 %excel sheet zu erstellen. 181009: jetzt mit AUC trapz
 
@@ -241,3 +241,4 @@ results.masterpeakpowerlogBL=masterpeakpowerlogBL(2:end,:);
 results.masterpeakpowernologBL=masterpeakpowernologBL(2:end,:);
 results.filenames=files;
 save('results.mat', 'results');
+
