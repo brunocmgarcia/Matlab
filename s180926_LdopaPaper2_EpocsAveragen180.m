@@ -7,11 +7,25 @@
 
 
 clear all
-cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN')
+
+if ~ispc
+    cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN')
+   
+else
+    cd('F:/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN')
+  
+end
+
+ if ~exist('prefooofed','dir')
+        mkdir('prefooofed');
+ end
+ if ~exist('gifs','dir')
+        mkdir('gifs');
+ end
 
 
 
-ordner=dir('*.mat');
+ordner=dir('*ArtCorr.mat');
 files={ordner.name}';
 
 
@@ -20,8 +34,8 @@ for file_i=1:length(files)
     dateiname=file{:};
     load(dateiname)
 
-
-
+    my_foi=TFRhann.freq;
+    
 
     time=TFRhann.time';
 
@@ -44,9 +58,9 @@ for file_i=1:length(files)
 
 
     farbe=jet(10);
-    Yscaling=7e+8;
+    Yscaling=4e+8;
 
-    spektral0_10=nanmean(TFRhann.powspctrm(:,:,1:min10),3);
+    spektral0_10=nanmedian(TFRhann.powspctrm(:,:,1:min10),3);
     h=figure('units','normalized','outerposition',[0 0 .6 .6]);
     subplot(1,3,1)
     plot(my_foi,spektral0_10, 'Color', farbe(1,:))
@@ -54,16 +68,16 @@ for file_i=1:length(files)
     ylim([0 Yscaling])
 
     if min10~=min15
-        spektral10_30(1,:)=nanmean(TFRhann.powspctrm(:,:,min10+1:min15),3);
+        spektral10_30(1,:)=nanmedian(TFRhann.powspctrm(:,:,min10+1:min15),3);
     else
         spektral10_30(1,1:length(my_foi))=nan;
     end
     if min20~=min30
-        spektral10_30(2,:)=nanmean(TFRhann.powspctrm(:,:,min20+1:min30),3);
+        spektral10_30(2,:)=nanmedian(TFRhann.powspctrm(:,:,min20+1:min30),3);
     else
         spektral10_30(2,1:length(my_foi))=nan;
     end
-    spektral10_30=nanmean(spektral10_30,1);
+    spektral10_30=nanmedian(spektral10_30,1);
 
     hold on
     plot(my_foi,spektral10_30, 'Color', farbe(2,:))
@@ -72,7 +86,7 @@ for file_i=1:length(files)
     hold off
 
     if min30~=min50
-        spektral30_50=nanmean(TFRhann.powspctrm(:,:,min30+1:min50),3);
+        spektral30_50=nanmedian(TFRhann.powspctrm(:,:,min30+1:min50),3);
     else
         spektral30_50(1:length(my_foi))=nan;
     end
@@ -83,7 +97,7 @@ for file_i=1:length(files)
     hold off
 
     if min50~=min70
-        spektral50_70=nanmean(TFRhann.powspctrm(:,:,min50+1:min70),3);
+        spektral50_70=nanmedian(TFRhann.powspctrm(:,:,min50+1:min70),3);
     else
         spektral50_70(1:length(my_foi))=nan;
     end
@@ -95,7 +109,7 @@ for file_i=1:length(files)
     hold off
 
     if min70~=min90
-        spektral70_90=nanmean(TFRhann.powspctrm(:,:,min70+1:min90),3);
+        spektral70_90=nanmedian(TFRhann.powspctrm(:,:,min70+1:min90),3);
     else
         spektral70_90(1:length(my_foi))=nan;
     end
@@ -107,7 +121,7 @@ for file_i=1:length(files)
     hold off
 
     if min90~=min110
-        spektral90_110=nanmean(TFRhann.powspctrm(:,:,min90+1:min110),3);
+        spektral90_110=nanmedian(TFRhann.powspctrm(:,:,min90+1:min110),3);
     else
         spektral90_110(1:length(my_foi))=nan;
     end
@@ -118,7 +132,7 @@ for file_i=1:length(files)
     hold off
 
     if min110~=min130
-        spektral110_130=nanmean(TFRhann.powspctrm(:,:,min110+1:min130),3);
+        spektral110_130=nanmedian(TFRhann.powspctrm(:,:,min110+1:min130),3);
     else
         spektral110_130(1:length(my_foi))=nan;
     end
@@ -129,7 +143,7 @@ for file_i=1:length(files)
     hold off
 
     if min130~=min150
-        spektral130_150=nanmean(TFRhann.powspctrm(:,:,min130+1:min150),3);
+        spektral130_150=nanmedian(TFRhann.powspctrm(:,:,min130+1:min150),3);
     else
         spektral130_150(1:length(my_foi))=nan;
     end
@@ -140,7 +154,7 @@ for file_i=1:length(files)
     hold off
 
     if min150~=min170
-        spektral150_170=nanmean(TFRhann.powspctrm(:,:,min150+1:min170),3);
+        spektral150_170=nanmedian(TFRhann.powspctrm(:,:,min150+1:min170),3);
     else
         spektral150_170(1:length(my_foi))=nan;
     end
@@ -151,7 +165,7 @@ for file_i=1:length(files)
     hold off
 
     if min170~=min180
-        spektral170_180=nanmean(TFRhann.powspctrm(:,:,min170+1:min180),3);
+        spektral170_180=nanmedian(TFRhann.powspctrm(:,:,min170+1:min180),3);
     else
         spektral170_180(1:length(my_foi))=nan;
     end
@@ -189,12 +203,12 @@ for file_i=1:length(files)
     hoehe=Yscaling*0.95;
     filename=[dateiname(1:end-4) '.gif']
     for i=1:floor((min10/5)):(length(time)-min10)
-    spektral_i=nanmean(TFRhann.powspctrm(:,:,i:i+min10),3);
+    spektral_i=nanmedian(TFRhann.powspctrm(:,:,i:i+min10),3);
     cla
     plot(my_foi,spektral_i)
     xlim([0 140])
     ylim([0 Yscaling])
-    text(120,hoehe,['Minuten: ' num2str(floor((time(i+min10))/60))])
+    text(110,hoehe,['minutes: ' num2str(floor((time(i+min10))/60))])
     xlabel('Frequency [Hz]')
     ylabel('Power [a.u.]')
     drawnow
@@ -202,9 +216,9 @@ for file_i=1:length(files)
     im=frame2im(frame);
     [imind,cm]=rgb2ind(im,256);
     if i==1
-        imwrite(imind,cm,filename,'gif','Loopcount',inf, 'DelayTime', 0.1);
+        imwrite(imind,cm,[cd '/gifs/' filename],'gif','Loopcount',inf, 'DelayTime', 0.1);
     else
-        imwrite(imind,cm,filename,'gif','Writemode','append', 'DelayTime', 0.1);
+        imwrite(imind,cm,[cd '/gifs/' filename],'gif','Writemode','append', 'DelayTime', 0.1);
     end   
     clearvars spektral_i frame im imind cm
     end
@@ -216,3 +230,10 @@ for file_i=1:length(files)
     clearvars -except files file_i
     close all
 end
+
+cd('prefooofed')
+
+    FileNameAndLocation=[mfilename('fullpath')];
+    newbackup=sprintf('%s_rundate_%s.m', mfilename, date);
+    currentfile=strcat(FileNameAndLocation, '.m');
+    copyfile(currentfile,newbackup);
