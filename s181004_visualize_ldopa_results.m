@@ -3,12 +3,12 @@ clc
 cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN/fooofed/MAT_processed')
 load results
 load VAR_wanted181129
-wanted=wanted(1:5,:);
+%wanted=wanted(1:5,:);
 set(0, 'DefaultTextInterpreter', 'none')
 
 %wanted=wanted';
-wanted=wanted(:,[1 3 4 5 7]);
-xachsentiere={'CG04','CG06','CG07','CG08','CG10'};
+wanted=wanted(:,[1 2 3 4 5 7]);
+xachsentiere={'CG04','CG05','CG06','CG07','CG08','CG10'};
 %wanted=wanted(:,[1 2 3 4 5 6 7]);
 %xachsentiere={'CG04','CG05','CG06','CG07','CG08','CG09','CG10'};
 

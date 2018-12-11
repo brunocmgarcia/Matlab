@@ -6,6 +6,9 @@
 
 clear all
 cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN/fooofed')
+if ~exist('MAT_processed','dir')
+        mkdir('MAT_processed');
+ end
 
 
 
@@ -31,10 +34,9 @@ for file_i=1:length(files)
     [verwerfen lower]=min(abs(lowerfreq-freq));
     [verwerfen upper]=min(abs(higherfreq-freq));
     
-    find(strcmp(dateiname,baselineschluessel));
-    BLdateiname=baselineschluessel(find(strcmp(dateiname,baselineschluessel)),2);
+    BLdateiname=baselineschluessel(find(strcmp([dateiname(1:end-18) '_4fooof.mat'],baselineschluessel)),2);
     BLdateiname=BLdateiname{:};
-    
+   
     peakpowerlog=[];
     peakpowernolog=[];
     peakpowerlogBL=[];
@@ -42,6 +44,7 @@ for file_i=1:length(files)
     peakfreq=[];
     
     if ~isempty(BLdateiname)
+         BLdateiname=[BLdateiname(1:end-18) '_TFRhannArtCorr_4fooof.mat'];
         BLdateiname=['/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/Ruhe10/TFRsWithNaN/fooofed/' BLdateiname]
         BLs=load(BLdateiname);
         BLfields=fieldnames(BLs);
@@ -242,3 +245,7 @@ results.masterpeakpowernologBL=masterpeakpowernologBL(2:end,:);
 results.filenames=files;
 save('results.mat', 'results');
 
+   FileNameAndLocation=[mfilename('fullpath')];
+    newbackup=sprintf('%s_rundate_%s.m', mfilename, date);
+    currentfile=strcat(FileNameAndLocation, '.m');
+    copyfile(currentfile,newbackup);

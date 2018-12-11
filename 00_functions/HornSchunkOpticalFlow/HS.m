@@ -89,6 +89,6 @@ u(isnan(u))=0;
 v(isnan(v))=0;
 
 %% Plotting
-if displayFlow==1
-    plotFlow(u, v, displayImg, 5, 5); 
-end
+% if displayFlow==1
+%     plotFlow(u, v, displayImg, 5, 5); 
+% end
