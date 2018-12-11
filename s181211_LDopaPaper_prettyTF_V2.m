@@ -12,7 +12,7 @@ count=0;
 % set(gca,'yDir','normal')
 % caxis([8 22])
 figure('Units','Normalized','Position',[0 0 1 1]);
-for file_i=1:7%1:size(baselineschluessel,1)
+for file_i=47:52%1:size(baselineschluessel,1)
 count=count+1;
 cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/Ruhe10/TFRsWithNaN/fooofed_prettyTF')
 
@@ -35,10 +35,10 @@ bgfit=bgfit';
 clearvars TFRhann
 
 subplot(7,1,count)
-imagesc(10.^(powerspectrum-bgfit))
+imagesc(10.^(powerspectrum./bgfit))
 set(gca, 'ydir', 'normal')
 
-forprctil=powerspectrum-bgfit;
+forprctil=powerspectrum./bgfit;
 forprctil=forprctil(:);
 forprctil=10.^forprctil;
 

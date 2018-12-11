@@ -15,7 +15,19 @@ masterpeakfreq=nanmedian(masterpeakfreq(:,5:6),2);
 
 masterpeakpowerlogBL=results.masterpeakpowerlogBL;
 masterpeakpowerlogBL=masterpeakpowerlogBL(wanted,:);
-masterpeakpowerlogBL=nanmedian(masterpeakpowerlogBL(:,5:6),2);
-
+masterpeakpowerlogBL=abs(nanmedian(masterpeakpowerlogBL(:,5:6),2));
+%% edit 181211 x und y als vielfaches von TP101 --> fazit: killt die korrelation. 
+% macht auch nicht so viel sinn. 
+% for i=1:5:35
+%     for ii=5:-1:1
+%         masterpeakpowerlogBL(i+(ii-1))=(masterpeakpowerlogBL(i+(ii-1))/masterpeakpowerlogBL(i));
+%     end
+% end
+% for i=1:5:35
+%     for ii=5:-1:1
+%         masterpeakfreq(i+(ii-1))=masterpeakfreq(i+(ii-1))/masterpeakfreq(i);
+%     end
+% end
+%%
 linearregression(masterpeakfreq,masterpeakpowerlogBL,'freq [Hz]','gamma power')
 

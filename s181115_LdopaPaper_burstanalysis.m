@@ -280,7 +280,7 @@ cd('Ruhe10')
 
 
 
-for file_i=1:length(baselineschluessel)    
+for file_i=1%:length(baselineschluessel)    
     datei=baselineschluessel(file_i,2);
     datei=[datei{:}(1:end-18) '.mat']
     
@@ -290,8 +290,19 @@ for file_i=1:length(baselineschluessel)
     cfg.demean='yes';
     data=ft_preprocessing(cfg,data);
 
-    load(['artdefs/' datei])
-
+    load(['TFRsWithNan/' datei(1:end-4) '_ArtTimes.mat'])
+    
+    for i=1:numel(threshold)
+    [verwerfen time2sample]=(min(abs(threshold(i)-data.time{1,1})));
+    threshold(i)=time2sample;
+    end
+    
+    for i=1:numel(zvalue)
+    [verwerfen time2sample]=(min(abs(zvalue(i)-data.time{1,1})));
+    zvalue(i)=time2sample;
+    end
+    
+    
     binaryartefactchannel=data.time{1,1}*0;
     for artefakt_i=1:size(zvalue,1) 
         binaryartefactchannel(zvalue(artefakt_i,1):zvalue(artefakt_i,2))=1;
@@ -405,6 +416,10 @@ for file_i=1:length(baselineschluessel)
     clearvars -except baselineschluessel file_i masterpeakfreq
 end
 
+FileNameAndLocation=[mfilename('fullpath')];
+    newbackup=sprintf('%s_rundate_%s.m', mfilename, date);
+    currentfile=strcat(FileNameAndLocation, '.m');
+    copyfile(currentfile,newbackup);
 
 %% jetzt die 180min dateien
 
@@ -432,7 +447,7 @@ else
 end
 cd('180')
 
-for file_i=1:length(baselineschluessel)    
+for file_i=1%:length(baselineschluessel)    
     datei=baselineschluessel(file_i,1);
     datei=[datei{:}(1:end-18) '.mat']
     load(datei)
@@ -446,9 +461,19 @@ for file_i=1:length(baselineschluessel)
     cfg=[]; 
     cfg.demean='yes';
     data=ft_preprocessing(cfg,data);
-
-    load(['artdefs/' datei])
-
+    
+    load(['TFRsWithNan/' datei(1:end-4) '_ArtTimes.mat'])
+    
+    for i=1:numel(threshold)
+    [verwerfen time2sample]=(min(abs(threshold(i)-data.time{1,1})));
+    threshold(i)=time2sample;
+    end
+    
+    for i=1:numel(zvalue)
+    [verwerfen time2sample]=(min(abs(zvalue(i)-data.time{1,1})));
+    zvalue(i)=time2sample;
+    end
+    
     binaryartefactchannel=data.time{1,1}*0;
     for artefakt_i=1:size(zvalue,1) 
         binaryartefactchannel(zvalue(artefakt_i,1):zvalue(artefakt_i,2))=1;
@@ -566,6 +591,10 @@ for file_i=1:length(baselineschluessel)
     clearvars -except baselineschluessel file_i masterpeakfreq 
 end
 
+ FileNameAndLocation=[mfilename('fullpath')];
+    newbackup=sprintf('%s_rundate_%s.m', mfilename, date);
+    currentfile=strcat(FileNameAndLocation, '.m');
+    copyfile(currentfile,newbackup);
 
 %% gif machen?
 
