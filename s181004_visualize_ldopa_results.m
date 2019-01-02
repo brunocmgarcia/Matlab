@@ -1,8 +1,12 @@
+%% stand: 4:7 und center of mass frequencys aus 181218_LDopa_PeakFreqGaussParams
+
 clear all
 clc
+close all
 cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN/fooofed/MAT_processed')
 load results
 load VAR_wanted181129
+
 %wanted=wanted(1:5,:);
 set(0, 'DefaultTextInterpreter', 'none')
 
@@ -15,7 +19,8 @@ xachsentiere={'CG04','CG05','CG06','CG07','CG08','CG10'};
 
 
 p=results.masterpeakpowerlogBL;
-f=results.masterpeakfreq;
+%f=results.masterpeakfreq;
+load VAR_centerofmasspeakfreqs
 x=1:size(p,2);
 farben=parula(size(wanted,1));
 figure
@@ -37,7 +42,7 @@ jbfill(x,oben(i,:),unten(i,:),farben(i,:),farben(i,:),0,0.2);
 
 
 end
-colorbar('Ticks', linspace(0.1,.9,5),'TickLabels',{'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21'})
+colorbar('Ticks', (1/size(wanted,1)/2):(1/size(wanted,1)):1,'TickLabels',{'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21','AntA', 'AntB'})
 xlabel('time post L-Dopa injection [min]')
 xticklabels({'0-10','10-30','30-50','50-70','70-90','90-110','110-130','130-150','150-170','170-180'})
 xticks(1:10)
@@ -57,7 +62,7 @@ end
 
 subplot(2,3,2)
 b=bar(squeeze(nanmean(testfreq(:,4:7,:),2)), 'Grouped','FaceColor','g');
-ylim([75 113])
+ylim([75 135])
 %xticklabels({'CG04','CG05','CG06','CG07','CG08','CG09','CG10'})
 xticklabels(xachsentiere)
 xlabel('animal #')
@@ -67,7 +72,7 @@ title('peak frequency')
 for i=1:5
 b(i).FaceColor = farben(i,:);
 end
-legend({'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21'})
+legend({'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21','AntA', 'AntB'})
 
 
 
@@ -91,8 +96,8 @@ end
 %ylim([87 103])
 hold off
 xlabel('# L-Dopa Inj.')
-xticklabels({'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21'})
-xticks(1:5)
+xticklabels({'LD 01','LD 04','LD 10','LD 16','LD 21','AntA', 'AntB'})
+xticks(1:7)
 ylabel('increase of peakfreq [Hz]')
 title('Mean increase of peakfreq 50-130min post Injection') 
 
@@ -113,7 +118,7 @@ jbfill(x(4:7),obenfreq(i,:),untenfreq(i,:),farben(i,:),farben(i,:),0,0.2);
 
 
 end
-colorbar('Ticks', 0.1:0.2:1,'TickLabels',{'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21'})
+colorbar('Ticks', (1/size(wanted,1)/2):(1/size(wanted,1)):1,'TickLabels',{'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21','AntA', 'AntB'})
 xlabel('time post L-Dopa injection [min]')
 xticklabels({'0-10','10-30','30-50','50-70','70-90','90-110','110-130','130-150','150-170','170-180'})
 xticks(1:10)
@@ -137,8 +142,17 @@ title('Mean of FTG power 50-130min post injection')
 for i=1:5
 b(i).FaceColor = farben(i,:);
 end
-legend({'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21'})
+legend({'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21','AntA', 'AntB'})
 
-
-
-
+figure('Name', 'Average Power')
+allpower=squeeze(nanmean(test(:,4:7,:),2));
+allpowerstd=(sqrt(var(allpower,0,1)));%/(sqrt(length(xachsentiere)))
+allpowersem=allpowerstd/(sqrt(length(xachsentiere)));
+allpower=nanmean(allpower,1);
+hold on
+bar(allpower,'FaceColor', 'k', 'EdgeColor', 'k')
+errorbar([1:size(test,3)],allpower, zeros(size(test,3),1),allpowersem,'.', 'Color', 'k')
+hold off
+xticklabels({'','L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21','AntA', 'AntB'})
+ylabel('AUC fooofed log10(Power) - basline, 70-130 Hz')
+title('Mean of FTG power 50-130min post injection')  

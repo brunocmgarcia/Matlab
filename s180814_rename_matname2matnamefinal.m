@@ -7,7 +7,7 @@ Matliste={datakey.key(:).MAT_name}';
 ordner=dir('*.mat');
 files={ordner.name}';
 
-for i=34:length(files)
+for i=1:length(files)
     file=files(i);
     file=file{:}
     file=file(1:end-4);

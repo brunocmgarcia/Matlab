@@ -12,9 +12,9 @@ close all
 %% 
 load('VAR_datakey.mat')
 cd('/Volumes/A_guettlec/Auswertung/tensorflow/videoartefaktdef')
-ordner=dir('*.mat');
+ordner=dir('*viddef.mat');
 files={ordner.name}';
-for file_i=140%:142;
+for file_i=266:length(files) % ab 16, da  CG01 keine matnamefinal hat.
    
     
     datei=files(file_i);
@@ -23,16 +23,28 @@ for file_i=140%:142;
     MAT_nameliste(cellfun('isempty', MAT_nameliste)) = {''}; % notwendig wenn liste l�cken hat.
     [index verwerfen] = find(~cellfun('isempty', strfind(MAT_nameliste, datei(1:end-11))));  
     ruhe20test=datakey.key(index).MAT_name_final;
-    ruhe20test=ruhe20test(end-3:end);
-    if ruhe20test~="Ruhe"
-        newvid = VideoWriter([datakey.key(index).MAT_name '.avi'],'Motion JPEG AVI');
-        newvid.FrameRate=10;
-        open(newvid)
+    if ~isempty(ruhe20test) && ruhe20test(end-3:end)~="Ruhe" 
+    %    newvid = VideoWriter([datakey.key(index).MAT_name '.avi'],'Motion JPEG AVI');
+    %    newvid.FrameRate=10;
+    %    open(newvid)
         load(datei)
         load(['/Volumes/A_guettlec/Auswertung/FINAL180416/00_Rec2Mat_corrChannels/' datakey.key(index).MAT_name '.mat'])
-        cd(['/Volumes/A_guettlec/Primaerdaten/TBSI/' datakey.key(index).video])
+        cd(['/Volumes/B_guettlec/Primaerdaten/TBSI/' datakey.key(index).video])
         rawvideo = VideoReader('Raw Video_1.avi');
-        load('Position Data.mat','time')
+        try
+            load('Position Data.mat','time')
+        catch
+
+            videoinfo.video_frames(1,1)=rawvideo.Duration*rawvideo.FrameRate;
+            videoinfo.time(1:videoinfo.video_frames(1,1),1)=...
+                ([1:videoinfo.video_frames(1,1)]*(videoinfo.video_frames(1,1)/rawvideo.Duration)*10)+97;
+            
+            % richtigwäre: *10.0745)+137;
+            time=videoinfo.time;
+            clearvars videoinfo
+        end
+        
+        
         cd('/Volumes/A_guettlec/Auswertung/tensorflow/videoartefaktdef')
         time=(time(:,1)/1000)';
 
@@ -60,16 +72,18 @@ for file_i=140%:142;
         %hold on
         frame1=readFrame(rawvideo);
         frame1 = rgb2gray(frame1);
-        imshow(frame1)
-        figure
+        
+        
         frame1 = imresize(frame1,0.25,'nearest');
-        imshow(frame1)
+       
         numFrames=1;
-        figure('Name',datakey.key(index).MAT_name_final)
-  
+        
+       
        % axis tight
         while hasFrame(rawvideo)
-
+    %        testfig=figure('Name',datakey.key(index).MAT_name_final,'Visible','off');
+    %        testax=axes('Visible','off');
+            disp(['File ' num2str(file_i-16) ' of ' num2str(length(files)-16) ' /// ' datei ' /// ' ruhe20test ' /// ' num2str(numFrames) ' of ' num2str(size(time,2)-1)])
             numFrames = numFrames + 1;
 
 
@@ -90,7 +104,7 @@ for file_i=140%:142;
 %             u=u(1:4:end,1:4:end);
             
 
-            hold on
+      %      hold on
 %             if time(2,numFrames-1)==1
 %                 scatter(sum(sum((u))),sum(sum(v)),'b','filled');
 %             else
@@ -99,41 +113,43 @@ for file_i=140%:142;
 % 
 %             hold off
             
-            imshow(frame1)
-             rSize=5;
-             scale=10;
-            for ii=1:size(u,1)
-              for j=1:size(u,2)
-                 if floor(ii/rSize)~=ii/rSize || floor(j/rSize)~=j/rSize
-                    u(ii,j)=0;
-                    v(ii,j)=0;
-                 end
-              end
-            end
-            hold on
-            quiver(u, v, scale, 'color', 'b', 'linewidth', 2);
-            set(gca,'YDir','reverse');
-            line([80 60+(mean(u(:)*2.5e4))],[80 60+(mean(v(:)*2.5e4))],'Color','r')
-            if time(2,numFrames-1)==1
-                 rectangle('Position', [5 5 10 10], 'FaceColor', [0 1 0 0.8])
-            else
-                 rectangle('Position', [5 5 10 10], 'FaceColor', [1 0 0 0.8])
-            end
-            hold off
-            xlim([0 160])
-            ylim([0 120])
-            writeVideo(newvid,getframe(gca));
-            close all
+       %     imshow(frame1);
+%              rSize=5;
+        %      scale=10;
+%             for ii=1:size(u,1)
+%               for j=1:size(u,2)
+%                  if floor(ii/rSize)~=ii/rSize || floor(j/rSize)~=j/rSize
+%                     u(ii,j)=0;
+%                     v(ii,j)=0;
+%                  end
+%               end
+%             end
+       %     hold on
+        %    quiver(u, v, scale, 'color', 'b', 'linewidth', 2);
+         %   set(gca,'YDir','reverse');
+         %   line([80 60+(mean(u(:)*2.5e4))],[80 60+(mean(v(:)*2.5e4))],'Color','r');
+          %  if time(2,numFrames-1)==1
+          %       rectangle('Position', [5 5 10 10], 'FaceColor', [0 1 0 0.8])
+         %   else
+          %       rectangle('Position', [5 5 10 10], 'FaceColor', [1 0 0 0.8])
+        %    end
+        %    hold off
+        %    xlim([0 160])
+        %    ylim([0 120])
+        %    writeVideo(newvid,getframe(gca));
+        %    close all
             frame1=frame2;
             
            
             
-            total_u(numFrames-1,:,:)=single(u);
-            total_v(numFrames-1,:,:)=single(v);
+            total_u(numFrames-1,:,:)=single(u*1e5);
+            total_v(numFrames-1,:,:)=single(v*1e5);
+            clearvars u v 
         end
-        close(newvid)
+    %    close(newvid)
         save([datakey.key(index).MAT_name '_Flow'],'total_u','total_v','time');
     end
+    clearvars -except files file_i datakey
 end
 %hold off
 % 

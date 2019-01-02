@@ -11,8 +11,8 @@ count=0;
 % imagesc(log(squeeze(TFRhann.powspctrm)))
 % set(gca,'yDir','normal')
 % caxis([8 22])
-figure('Units','Normalized','Position',[0 0 1 1]);
-for file_i=47:52%1:size(baselineschluessel,1)
+figure('Name','divided','Units','Normalized','Position',[0 0 1 .3]);
+for file_i=2%1:size(baselineschluessel,1)
 count=count+1;
 cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/Ruhe10/TFRsWithNaN/fooofed_prettyTF')
 
@@ -34,15 +34,22 @@ powerspectrum=log(squeeze(TFRhann.powspctrm)); %log
 bgfit=bgfit';
 clearvars TFRhann
 
-subplot(7,1,count)
-imagesc(10.^(powerspectrum./bgfit))
+subplot(1,1,count)
+imagesc(10.^(powerspectrum./bgfit)) %10.^
 set(gca, 'ydir', 'normal')
 
 forprctil=powerspectrum./bgfit;
 forprctil=forprctil(:);
-forprctil=10.^forprctil;
+forprctil=10.^forprctil; %10^
 
-caxis([prctile(forprctil,15) prctile(forprctil,90)])
+%caxis([prctile(forprctil,15) prctile(forprctil,90)])
+caxis([140 800])
 
+
+% caxis([140 400])
+% %xlim([2100 2100+800]) % beta
+% xlim([5.8e4 5.8e4+800]) % gamma
 
 end
+
+%print('large','-deps','-r300')

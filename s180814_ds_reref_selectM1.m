@@ -34,10 +34,10 @@ for i=1:length(files)
    
    
    
-    cd downsampled_NOreref_m1
+    %cd downsampled_NOreref_m1
     
     save([file(1:end-4) '_ds_NOreref_m1.mat'],'data')  % function form 
-    cd ..
+    %cd ..
    
     clearvars -except i files
 end

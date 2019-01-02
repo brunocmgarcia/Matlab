@@ -1,11 +1,7 @@
-%% Ldopa3: nimmt die gefoooften datein zur�ck.
-%output: jeweils eine figure mit original powspctr, gauss model, flat.
-% flat als lineartransform. dann baseline (flat) abziehen. zus�tzlich am schluss eine csv f�r
-%peaks und linpeak AUC sowie txt liste aller datei namen um am schluss ein
-%excel sheet zu erstellen. 181009: jetzt mit AUC trapz
+%% s181227_Ldopa3_II_TP00and31: nimmt die gefoooften datein zur�ck.
 
 clear all
-cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN/fooofed')
+cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/TP00&TP31/TFRsWithNaN/fooofed')
 if ~exist('MAT_processed','dir')
         mkdir('MAT_processed');
  end
@@ -17,15 +13,15 @@ files={ordner.name}';
 lowerfreq=70;
 higherfreq=130;
 
-masterpeakpowerlog(1:10)=nan;
-masterpeakpowernolog(1:10)=nan;
-masterpeakpowerlogBL(1:10)=nan;
-masterpeakpowernologBL(1:10)=nan;
-masterpeakfreq(1:10)=nan;
+masterpeakpowerlog=nan;
+masterpeakpowernolog=nan;
+masterpeakpowerlogBL=nan;
+masterpeakpowernologBL=nan;
+masterpeakfreq=nan;
 
-load VAR_baselineschluessel
 
-for file_i=10:length(files)
+
+for file_i=1:length(files)
     file=files(file_i);
     dateiname=file{:};
     s=load(dateiname);
@@ -34,20 +30,12 @@ for file_i=10:length(files)
     [verwerfen lower]=min(abs(lowerfreq-freq));
     [verwerfen upper]=min(abs(higherfreq-freq));
     
-    BLdateiname=baselineschluessel(find(strcmp([dateiname(1:end-18) '_4fooof.mat'],baselineschluessel)),2);
-    BLdateiname=BLdateiname{:};
    
     peakpowerlog=[];
     peakpowernolog=[];
     peakpowerlogBL=[];
     peakpowernologBL=[];
     peakfreq=[];
-    
-    if ~isempty(BLdateiname)
-         BLdateiname=[BLdateiname(1:end-18) '_TFRhannArtCorr_4fooof.mat'];
-        BLdateiname=['/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/Ruhe10/TFRsWithNaN/fooofed/' BLdateiname]
-        BLs=load(BLdateiname);
-        BLfields=fieldnames(BLs);
         
         myfig=figure('units','normalized','outerposition',[0 0 1 1]);
         axis tight manual
@@ -61,7 +49,7 @@ for file_i=10:length(files)
         s4=subplot(2,4,4);
         s5=subplot(2,4,7);
         s6=subplot(2,4,8);
-
+================== ediz bis hier 
         for i=1:9:length(fields)
             zaehler=zaehler+1;
             BLpower=BLs.(cell2mat(BLfields(6)));

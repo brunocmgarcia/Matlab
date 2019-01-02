@@ -15,7 +15,7 @@ histogram_einstellung_norm='probability';
 load VAR_baselineschluessel
 baselineschluessel=baselineschluessel(10:end,:);
 
-cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/burst')
+cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/burstCenterOfMass')
 ordner=dir('*.mat');
 files={ordner.name}';
 
@@ -28,7 +28,7 @@ for file_i=1:length(baselineschluessel)
     datei10=datei10{:}(1:end-18);
     datei10=[datei10 '_burst.mat']
     load(datei180)
-    basestruct=load(['/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/Ruhe10/burst/' datei10]);
+    basestruct=load(['/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/Ruhe10/burstCenterOfMass/' datei10]);
     P75rs=basestruct.P75rs;
     
     for i=1:length(basestruct.rs_NumBlockStart)

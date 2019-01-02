@@ -260,10 +260,12 @@ load VAR_baselineschluessel
 
 cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN/fooofed/MAT_processed')
 load results
-
-masterpeakfreq=results.masterpeakfreq;
+load  VAR_centerofmasspeakfreqs 
+%masterpeakfreq=results.masterpeakfreq; % edit centerofmass
+masterpeakfreq=f; % edit centerofmass
 masterpeakfreq=masterpeakfreq(10:end,:);
-masterpeakfreq=nanmedian(masterpeakfreq(:,5:6),2);
+%masterpeakfreq=nanmedian(masterpeakfreq(:,5:6),2);
+masterpeakfreq=nanmean(masterpeakfreq(:,4:7),2); % edit centerofmass
 
 clearvars results
 
@@ -280,7 +282,7 @@ cd('Ruhe10')
 
 
 
-for file_i=1%:length(baselineschluessel)    
+for file_i=1:length(baselineschluessel)    
     datei=baselineschluessel(file_i,2);
     datei=[datei{:}(1:end-18) '.mat']
     
@@ -409,9 +411,9 @@ for file_i=1%:length(baselineschluessel)
         hold off
     s5=subplot(4,4,16);
     set(s5, 'visible', 'off');
-    saveas(gcf,['burst/' datei(1:end-4) '_burst.png']);
-    savefig(['burst/' datei(1:end-4) '_burst'])
-    save(['burst/' datei(1:end-4) '_burst.mat'], 'rs_NumBlockStart','rs_NumBlockEnd','rs_NumBlockLength','P75rs','myhist','datrectsmooth');
+    saveas(gcf,['burstCenterOfMass/' datei(1:end-4) '_burst.png']);
+    savefig(['burstCenterOfMass/' datei(1:end-4) '_burst'])
+    save(['burstCenterOfMass/' datei(1:end-4) '_burst.mat'], 'rs_NumBlockStart','rs_NumBlockEnd','rs_NumBlockLength','P75rs','myhist','datrectsmooth');
     close all
     clearvars -except baselineschluessel file_i masterpeakfreq
 end
@@ -432,11 +434,16 @@ FileNameAndLocation=[mfilename('fullpath')];
  load VAR_baselineschluessel
  baselineschluessel=baselineschluessel(10:end,:);
  cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN/fooofed/MAT_processed')
-  load results
+load results
 
-masterpeakfreq=results.masterpeakfreq;
+
+load  VAR_centerofmasspeakfreqs 
+%masterpeakfreq=results.masterpeakfreq; % edit centerofmass
+masterpeakfreq=f; % edit centerofmass
 masterpeakfreq=masterpeakfreq(10:end,:);
-masterpeakfreq=nanmedian(masterpeakfreq(:,4:7),2);
+%masterpeakfreq=nanmedian(masterpeakfreq(:,5:6),2);
+masterpeakfreq=nanmean(masterpeakfreq(:,4:7),2); % edit centerofmass
+
 clearvars results
 
 if ~ispc
@@ -447,7 +454,7 @@ else
 end
 cd('180')
 
-for file_i=1%:length(baselineschluessel)    
+for file_i=1:length(baselineschluessel)    
     datei=baselineschluessel(file_i,1);
     datei=[datei{:}(1:end-18) '.mat']
     load(datei)
@@ -456,7 +463,7 @@ for file_i=1%:length(baselineschluessel)
     baselinedat=baselinedat{:}(1:end-18);
     baselinedat=[baselinedat '_burst.mat']
     load(datei)
-    basestruct=load(['/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/Ruhe10/burst/' baselinedat]);
+    basestruct=load(['/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/Ruhe10/burstCenterOfMass/' baselinedat]);
     P75rs=basestruct.P75rs;
     cfg=[]; 
     cfg.demean='yes';
@@ -583,9 +590,9 @@ for file_i=1%:length(baselineschluessel)
         hold off
     s5=subplot(4,4,16);
     set(s5, 'visible', 'off');
-    saveas(gcf,['burst/' datei(1:end-4) '_burst.png']);
-    savefig(['burst/' datei(1:end-4) '_burst'])
-    save(['burst/' datei(1:end-4) '_burst.mat'], 'rs_NumBlockStart','rs_NumBlockEnd','rs_NumBlockLength','P75rs','myhist','datrectsmooth', 'rs_NumBlockStartold','rs_NumBlockEndold','rs_NumBlockLengthold');
+    saveas(gcf,['burstCenterOfMass/' datei(1:end-4) '_burst.png']);
+    savefig(['burstCenterOfMass/' datei(1:end-4) '_burst'])
+    save(['burstCenterOfMass/' datei(1:end-4) '_burst.mat'], 'rs_NumBlockStart','rs_NumBlockEnd','rs_NumBlockLength','P75rs','myhist','datrectsmooth', 'rs_NumBlockStartold','rs_NumBlockEndold','rs_NumBlockLengthold');
     close all
     end
     clearvars -except baselineschluessel file_i masterpeakfreq 
