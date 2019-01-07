@@ -1,9 +1,10 @@
 %%
 clear all
-load VAR_GlobalAim_K
+close all
+load VAR_GlobalAim
 
-namelist={GlobalAim_K{:,1}}';
-globalaims=[GlobalAim_K{:,2}]';
+namelist={GlobalAim{:,1}}';
+globalaims=[GlobalAim{:,4}]'; % 2= kaloyan 3= saskia 4=average
 %%
 CG04=find(contains(namelist,'CG04'));
 CG05=find(contains(namelist,'CG05'));

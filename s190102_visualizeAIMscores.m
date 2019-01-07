@@ -7,8 +7,9 @@ load VAR_Global_AIM_matrix
 
 TP=[1 2 3 4 5 7 8]; % = TP101 104 110 116 121 300 400
 zeitstrahl=[0 5 20 30 40 60 80 100 120 140 160 180];
-%animals=[1 3 4 7]; % responders
-animals=[1 2 3 4 5 6 7]; % all
+animals=[1 3 4 5 7]; % responders
+%animals=[2 5]; % nonresponders
+%animals=[1 2 3 4 5 6 7]; % all
 
 farbe=parula(length(TP));
 figure
@@ -74,5 +75,120 @@ ylabel('Global AIM score')
 title('Global AIM score ± STD') 
 
 for_stats=squeeze(mean(GlobalAIMmatrix(animals,(6:9),TP),2));
-%linearregression(masterpeakfreq,masterpeakpowerlogBL,'freq [Hz]','gamma power')
+AIMforcorrelation=GlobalAIMmatrix(animals,[2 3 5:12],TP);
+
+cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN/fooofed/MAT_processed')
+load results
+load VAR_wanted181129
+wantedTP=TP;
+wantedTPindex=find(wantedTP>5);
+wantedTP(wantedTPindex)=wantedTP(wantedTPindex)-1;
+wanted=wanted(wantedTP,animals);
+
+
+p=results.masterpeakpowerlogBL;
+for i=1:size(wanted,1)
+powerforcorrelation(:,:,i)=p(wanted(i,:),:); % tier x zeit x TP
+end
+
+backupAIMforcorrelation=AIMforcorrelation;
+backuppowerforcorrelation=powerforcorrelation;
+
+% AIMforcorrelation=AIMforcorrelation(:,4:7,:);
+% powerforcorrelation=powerforcorrelation(:,4:7,:);
+
+AIMforcorrelation=AIMforcorrelation(:);
+powerforcorrelation=powerforcorrelation(:);
+
+% excludeVals=find(AIMforcorrelation<=0);
+% powerforcorrelation(excludeVals)=[];
+% AIMforcorrelation(excludeVals)=[];
+% excludeVals=find(powerforcorrelation<=0);
+% powerforcorrelation(excludeVals)=[];
+% AIMforcorrelation(excludeVals)=[];
+
+
+
+linearregression(AIMforcorrelation,powerforcorrelation,'global AIM','gamma power',1)
+
+for i=1:length(TP)
+    AIMforcorrelation=backupAIMforcorrelation(:,:,i);
+    powerforcorrelation=backuppowerforcorrelation(:,:,i);
+    AIMforcorrelation=AIMforcorrelation(:);
+    powerforcorrelation=powerforcorrelation(:);
+
+%     excludeVals=find(AIMforcorrelation<=0);
+%     powerforcorrelation(excludeVals)=[];
+%     AIMforcorrelation(excludeVals)=[];
+%     excludeVals=find(powerforcorrelation<=0);
+%     powerforcorrelation(excludeVals)=[];
+%     AIMforcorrelation(excludeVals)=[];
+
+
+
+    [r2_1(i) r2_2(i) pR(i) pP(i) sR(i) sP(i)]=linearregression(AIMforcorrelation,powerforcorrelation,'global AIM','gamma power',0);
+end
+
+figure 
+bar(pR)
+xticklabels({'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21','AntA', 'AntB'})
+ylabel('spearman rho')
+title('spearmans rho over time') 
+
+figure
+
+hold on
+scatter(reshape(backupAIMforcorrelation(:,:,1:5),[],1),reshape(backuppowerforcorrelation(:,:,1:5),[],1),30,'black')
+scatter(reshape(backupAIMforcorrelation(:,:,6),[],1),reshape(backuppowerforcorrelation(:,:,6),[],1),30,'red')
+scatter(reshape(backupAIMforcorrelation(:,:,7),[],1),reshape(backuppowerforcorrelation(:,:,7),[],1),30,'green')
+hold off
+legend({'L-Dopa','racloprid', 'halobenzazepine'})
+xlabel('Global AIM')
+ylabel('FTG Power')
+title('L-Dopa vs Antagonists') 
+
+%% mit freq
+figure
+
+hold on
+load VAR_centerofmasspeakfreqs
+for i=1:size(wanted,1)
+testfreq(:,:,i)=f(wanted(i,:),:);
+end
+normalisation=nanmean(testfreq(:,4:7,1),2); % 50-130min freq der ersten ldopa injection für jedes tier
+% normalisation=min(min(testfreq(:,:,:),[],2),[],3);
+% normalisation=80;
+testfreq=testfreq-normalisation;
+
+scatter(reshape(testfreq(:,:,1:5),[],1),reshape(backupAIMforcorrelation(:,:,1:5),[],1),30,'black')
+scatter(reshape(testfreq(:,:,6),[],1),reshape(backupAIMforcorrelation(:,:,6),[],1),30,'red')
+scatter(reshape(testfreq(:,:,7),[],1),reshape(backupAIMforcorrelation(:,:,7),[],1),30,'green')
+
+hold off
+legend({'L-Dopa','racloprid', 'halobenzazepine'})
+xlabel('Frequency Verschiebung')
+ylabel('Global AIM')
+title('L-Dopa vs Antagonists') 
+
+
+figure
+hold on
+load VAR_centerofmasspeakfreqs
+for i=1:size(wanted,1)
+testfreq(:,:,i)=f(wanted(i,:),:);
+end
+normalisation=nanmean(testfreq(:,4:7,1),2);% 50-130min freq der ersten ldopa injection für jedes tier
+% normalisation=min(min(testfreq(:,:,:),[],2),[],3);
+% normalisation=80;
+testfreq=testfreq-normalisation;
+scatter(reshape(backupAIMforcorrelation(:,:,1:5),[],1),reshape(testfreq(:,:,1:5),[],1).*reshape(backuppowerforcorrelation(:,:,1:5),[],1),30,'black')
+scatter(reshape(backupAIMforcorrelation(:,:,6),[],1),reshape(testfreq(:,:,6),[],1).*reshape(backuppowerforcorrelation(:,:,6),[],1),30,'red')
+scatter(reshape(backupAIMforcorrelation(:,:,7),[],1),reshape(testfreq(:,:,7),[],1).*reshape(backuppowerforcorrelation(:,:,7),[],1),30,'green')
+hold off
+legend({'L-Dopa','racloprid', 'halobenzazepine'})
+ylabel('Frequency Verschiebung x power')
+xlabel('Global AIM')
+title('L-Dopa vs Antagonists') 
+
+linearregression(reshape(backupAIMforcorrelation(:,:,1:7),[],1),(reshape(testfreq(:,:,1:7),[],1)).*(reshape(backuppowerforcorrelation(:,:,1:7),[],1)),'Global AIM','Frequency Verschiebung x power',1)
 
