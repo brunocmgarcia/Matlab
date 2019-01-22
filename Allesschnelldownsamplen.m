@@ -5,17 +5,36 @@ clear all
 dateien=dir('*.mat');
 dateien={dateien.name};
 dateien=dateien';
-mkdir autoartefakt
+mkdir ds
 
 for i=1:length(dateien)
     i
     datei_i=dateien(i);
     datei_i=datei_i{:};
     load(datei_i);
+    
+    cfg=[];
+    cfg.channel=30;
+    data=ft_selectdata(cfg,data);
+    
+    
+    
+    cfg=[];
+    cfg.feedback='no';
+    cfg.demean='yes';
+    cfg.lpfilter='yes';
+    cfg.lpfreq=100;
+    
+    
+    data=ft_preprocessing(cfg,data);
+    
     cfg=[];
     cfg.feedback='no';
     cfg.resamplefs=500;
+    
     data=ft_resampledata(cfg,data);
+    
+    
 %         cfg=[];
 %         cfg.reref='yes';
 %         cfg.refchannel=31;
@@ -53,7 +72,7 @@ for i=1:length(dateien)
 %     
 %     
 %     
-    zielname=[cd '\autoartefakt\' datei_i(1:end-4) '_ds.mat'];
+    zielname=[cd '\ds\' datei_i(1:end-4) '_ds.mat'];
     save(zielname, 'data');
     
     

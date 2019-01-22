@@ -76,7 +76,7 @@ for i=1:length(Bruchanalyse.stuecke)
     a=Bruchanalyse.stuecke(i);
     a=a{:};
     
-    histogram(a,);
+    histogram(a);
     %scatter((ones(length(a),1)*i),a);
     clearvars a
 end
