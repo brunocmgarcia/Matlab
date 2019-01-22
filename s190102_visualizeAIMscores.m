@@ -7,12 +7,12 @@ load VAR_Global_AIM_matrix
 
 TP=[1 2 3 4 5 7 8]; % = TP101 104 110 116 121 300 400
 zeitstrahl=[0 5 20 30 40 60 80 100 120 140 160 180];
-animals=[1 3 4 5 7]; % responders
+animals=[1 3 4 5 7]; % CG4 678 10
 %animals=[2 5]; % nonresponders
 %animals=[1 2 3 4 5 6 7]; % all
 
 farbe=parula(length(TP));
-figure
+figure('units','normalized','Position', [0 0 1 1])
 axis tight
 colormap(farbe);
 hold on
@@ -25,7 +25,7 @@ oben(i,:)=meanTP(i,:)+SEMTP(i,:);
 unten(i,:)=meanTP(i,:)-SEMTP(i,:);
 jbfill(zeitstrahl,oben(i,:),unten(i,:),farbe(i,:),farbe(i,:),0,0.2);
 end
-colorbar('Ticks', (1/length(TP)/2):(1/length(TP)):1,'TickLabels',{'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21','AntA', 'AntB'})
+colorbar('Ticks', (1/length(TP)/2):(1/length(TP)):1,'TickLabels',{'l-dopa 1','l-dopa 4','l-dopa 10','l-dopa 16','l-dopa 21','l-dopa + raclopride', 'l-dopa + halobenzazepine'})
 xlabel('time post L-Dopa injection [min]')
 xticklabels({'0','5','20','30','40','60','80','100','120','140','160','180'})
 xticks(zeitstrahl)
@@ -33,7 +33,7 @@ ylabel('Global AIM score')
 title('Global AIM score ± SEM') 
 hold off
 
-figure
+figure('units','centimeters','InnerPosition', [10 10 6.9 4.3])
 hold on
 bar(mean(meanTP(:,6:9),2),'FaceColor', 'k', 'EdgeColor', 'k')
 errorbar([1:size(meanTP,1)],mean(meanTP(:,6:9),2), zeros(size(meanTP,1),1),mean(SEMTP(:,6:9),2),'.', 'Color', 'k')
@@ -68,7 +68,7 @@ hold off
 figure
 hold on
 bar(mean(meanTP(:,6:9),2),'FaceColor', 'k', 'EdgeColor', 'k')
-errorbar([1:size(meanTP,1)],mean(meanTP(:,6:9),2), zeros(size(meanTP,1),1),mean(stdTP(:,6:9),2),'.', 'Color', 'k')
+errorbar([1:size(meanTP,1)],mean(meanTP(:,6:9),2), zeros(size(meanTP,1),1),(mean(stdTP(:,6:9),2)),'.', 'Color', 'k')
 hold off
 xticklabels({'','L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21','AntA', 'AntB'})
 ylabel('Global AIM score')
@@ -160,15 +160,18 @@ normalisation=nanmean(testfreq(:,4:7,1),2); % 50-130min freq der ersten ldopa in
 % normalisation=80;
 testfreq=testfreq-normalisation;
 
-scatter(reshape(testfreq(:,:,1:5),[],1),reshape(backupAIMforcorrelation(:,:,1:5),[],1),30,'black')
-scatter(reshape(testfreq(:,:,6),[],1),reshape(backupAIMforcorrelation(:,:,6),[],1),30,'red')
-scatter(reshape(testfreq(:,:,7),[],1),reshape(backupAIMforcorrelation(:,:,7),[],1),30,'green')
+scatter(reshape(backupAIMforcorrelation(:,4:7,1:5),[],1),reshape(testfreq(:,4:7,1:5),[],1),30,'black')
+scatter(reshape(backupAIMforcorrelation(:,4:7,6),[],1),reshape(testfreq(:,4:7,6),[],1),30,'red')
+scatter(reshape(backupAIMforcorrelation(:,4:7,7),[],1),reshape(testfreq(:,4:7,7),[],1),30,'green')
 
 hold off
 legend({'L-Dopa','racloprid', 'halobenzazepine'})
-xlabel('Frequency Verschiebung')
-ylabel('Global AIM')
-title('L-Dopa vs Antagonists') 
+
+xlabel('Global AIM')
+ylabel('Frequency Verschiebung [Hz]')
+title('AIM vs frequency') 
+
+linearregression(reshape(backupAIMforcorrelation(:,4:7,1:7),[],1),(reshape(testfreq(:,4:7,1:7),[],1)),'Global AIM','Frequency Verschiebung [Hz]',1)
 
 
 figure

@@ -5,7 +5,7 @@ clear all
 clc
 
 histogram_einstellung=0.01:0.05:.6;
-histogram_einstellung_norm='count';
+histogram_einstellung_norm='probability';
 
 load VAR_baselineschluessel
 baselineschluessel=baselineschluessel(10:end,:);
@@ -24,7 +24,7 @@ for file_i=1:length(baselineschluessel)
     datei10=[datei10 '_burst.mat']
     load(datei180)
     basestruct=load(['/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/Ruhe10/burst/' datei10]);
-    %P75rs=basestruct.P75rs;
+    P75rs=basestruct.P75rs; % 
     figure
     subplot(1,2,1)
     myhist180=histogram(rs_NumBlockLength, histogram_einstellung,  'Normalization', histogram_einstellung_norm);

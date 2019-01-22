@@ -11,8 +11,8 @@ load VAR_wanted181129
 set(0, 'DefaultTextInterpreter', 'none')
 
 %wanted=wanted';
-wanted=wanted(:,[1 2 3 4 5 7]);
-xachsentiere={'CG04','CG05','CG06','CG07','CG08','CG10'};
+wanted=wanted(:,[1 3 4 5 7]);
+xachsentiere={'CG04','CG06','CG07','CG08','CG10'};
 %wanted=wanted(:,[1 2 3 4 5 6 7]);
 %xachsentiere={'CG04','CG05','CG06','CG07','CG08','CG09','CG10'};
 
@@ -48,7 +48,7 @@ xticklabels({'0-10','10-30','30-50','50-70','70-90','90-110','110-130','130-150'
 xticks(1:10)
 ylabel('AUC fooofed log10(Power) - basline, 70-130 Hz')
 title('Mean of all animals ± SEM of FTG') 
-
+ylim([0 15])
 hold off
 
 
@@ -79,7 +79,7 @@ legend({'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21','AntA', 'Ant
 normalisation=nanmean(testfreq(:,4:7,1),2); % 50-130min freq der ersten ldopa injection für jedes tier
 testfreq=testfreq-normalisation;
 
-subplot(2,3,3)
+figure%subplot(2,3,3)
 hold on
 
 for i=1:size(wanted,1)
@@ -90,7 +90,7 @@ totalstd(i)=sqrt(mean(varianzfreq(i,:),2));
 SEMfreq(i) = totalstd(i) ./ sqrt(size(wanted,2));
 % obenfreq(i,:)=mittelwertfreq(i,:)+SEMfreq;
 % untenfreq(i,:)=mittelwertfreq(i,:)-SEMfreq;
-bar(i,totalmittelwert(i), 0.4,'FaceColor', 'k', 'EdgeColor', 'k')
+bar(i,totalmittelwert(i), 0.8,'FaceColor', 'k', 'EdgeColor', 'k')
 errorbar(i,totalmittelwert(i), 0,SEMfreq(i), 'Color', 'k')
 end
 %ylim([87 103])

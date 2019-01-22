@@ -4,7 +4,23 @@ close all
 load VAR_GlobalAim
 
 namelist={GlobalAim{:,1}}';
-globalaims=[GlobalAim{:,4}]'; % 2= kaloyan 3= saskia 4=average
+globalaims=[GlobalAim{:,4}]';% 2= kaloyan 3= saskia 4=average
+
+
+%% korrekturen nach meeting 190117
+globalaims(6)=8;
+globalaims(8)=4;
+globalaims(14)=13;
+globalaims(19)= 32;
+globalaims(20)=32;
+globalaims(28)=27;
+globalaims(50)=24;
+globalaims(244)=27;
+globalaims(290)=0;
+globalaims(346)=21;
+globalaims(373)=30;
+
+
 %%
 CG04=find(contains(namelist,'CG04'));
 CG05=find(contains(namelist,'CG05'));
@@ -1038,5 +1054,5 @@ try Animals_TP500(7,12)=globalaims(intersect(intersect(CG10,TP500),T180)); end
 
 GlobalAIMmatrix=cat(3,Animals_TP101,Animals_TP104,Animals_TP110,Animals_TP116,...
     Animals_TP121,Animals_TP200,Animals_TP300,Animals_TP400,Animals_TP500);
-GlobalAIMmatrix_info="animals (CG04 bis 10) x minute (0,5,20...) x TP(101,...,TP500)";
+GlobalAIMmatrix_info="animals (CG04 bis 10) x minute (0,5,20...) x TP(101,...,TP500) korrigiert nach meeting 190117";
 save('VAR_Global_AIM_matrix','GlobalAIMmatrix','GlobalAIMmatrix_info');

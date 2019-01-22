@@ -12,8 +12,12 @@ clear all
 close all
 
 
-[b, a] = butter(4, 500/1000);
+[b, a] = butter(100, [90/500 100/500]);
+[sos,g] = tf2sos(b,a);
+%then examine it for stability:
 
+figure
+freqz(sos, 1024, 500)
 
 
 
