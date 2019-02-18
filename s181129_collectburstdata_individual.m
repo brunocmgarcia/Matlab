@@ -39,7 +39,7 @@ for file_i=1:length(baselineschluessel)
     LDaveragelength(file_i,:)=mean(rs_NumBlockLength);
     BLaveragelength(file_i,:)=mean(basestruct.rs_NumBlockLength);
     BLlengthsave=basestruct.rs_NumBlockLength;
-    save(['/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/burstCenterOfMass/correlation/' num2str(file_i)],'rs_NumBlockLength','BLlengthsave', '-append');
+ %   save(['/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/burstCenterOfMass/correlation/' num2str(file_i)],'rs_NumBlockLength','BLlengthsave', '-append');
 
 close all
 clearvars -except BLaveragelength LDaveragelength totalp75_10 totalp75_180 totalbinprob180 histogram_einstellung_norm histogram_einstellung totalbinprob10 files file_i baselineschluessel
@@ -163,9 +163,9 @@ ylim([0 0.6])
 hold off
 end
 
-%% averages
+%% averages als SEM!
 figure('Units','Normalized','Position',[0 0 1 1]) 
-title('Average Baseline burst development')
+title('Average Baseline burst development SEM')
 hold on
 bar(squeeze(mean(totalbaselineforplot,3)),'BarWidth',0.5,'EdgeColor','none');
 xticklabels(split(cellstr([num2str(histogram_einstellung(2:end-1)*1000) ' >' num2str(histogram_einstellung(end-1)*1000)])))
@@ -176,7 +176,7 @@ ngroups=size(squeeze(mean(totalbaselineforplot,3)),1);
 nbars=size(squeeze(mean(totalbaselineforplot,3)),2);
 groupwidth=min(0.8, nbars/(nbars+1.5));
 BLerrorbarx=squeeze(mean(permute(totalbaselineforplot,[3 1 2]),1));
-BLerrorbary=squeeze(std(permute(totalbaselineforplot,[3 1 2])));
+BLerrorbary=(squeeze(std(permute(totalbaselineforplot,[3 1 2]))))/sqrt(5); % SEM!
 for i=1:nbars
     x=(1:ngroups)-groupwidth/2+(2*i-1)*groupwidth/(2*nbars);
     
@@ -188,7 +188,7 @@ hold off
 
 
 figure('Units','Normalized','Position',[0 0 1 1]) 
-title('Average L-Dopa burst development')
+title('Average L-Dopa burst development SEM')
 hold on
 bar(squeeze(mean(totalLDopaProb,3)),'BarWidth',0.5,'EdgeColor','none');
 xticklabels(split(cellstr([num2str(histogram_einstellung(2:end-1)*1000) ' >' num2str(histogram_einstellung(end-1)*1000)])))
@@ -199,7 +199,7 @@ ngroups=size(squeeze(mean(totalLDopaProb,3)),1);
 nbars=size(squeeze(mean(totalLDopaProb,3)),2);
 groupwidth=min(0.8, nbars/(nbars+1.5));
 LDerrorbarx=squeeze(mean(permute(totalLDopaProb,[3 1 2]),1));
-LDerrorbary=squeeze(std(permute(totalLDopaProb,[3 1 2])));
+LDerrorbary=(squeeze(std(permute(totalLDopaProb,[3 1 2]))))/sqrt(5);
 for i=1:nbars
     x=(1:ngroups)-groupwidth/2+(2*i-1)*groupwidth/(2*nbars);
     
@@ -211,7 +211,7 @@ hold off
 
 figure('Units','Normalized','Position',[0 0 1 1]) 
 subplot(1,2,1)
-title('Average Baseline burst length')
+title('Average Baseline burst length SEM')
 hold on
 meanBLaveragelength=mean(...
     [BLaveragelength(TP101),...
@@ -229,6 +229,8 @@ stdBLaveragelength=std(...
     BLaveragelength(TP121),...
     BLaveragelength(TP300),...
     BLaveragelength(TP400)]);
+
+stdBLaveragelength=stdBLaveragelength/sqrt(5); % SEM
 
 bar(meanBLaveragelength,'BarWidth',0.5,'EdgeColor','none','FaceColor','black');
 xticklabels({'TP101','TP104','TP110','TP116', 'TP121', 'D1ant', 'D2ant'})
@@ -258,6 +260,8 @@ stdLDaveragelength=std(...
     LDaveragelength(TP300),...
     LDaveragelength(TP400)]);
 
+stdLDaveragelength=stdLDaveragelength/sqrt(5); % SEM
+
 bar(meanLDaveragelength,'BarWidth',0.5,'EdgeColor','none','FaceColor','black');
 xticklabels({'TP101','TP104','TP110','TP116', 'TP121', 'D1ant', 'D2ant'})
 xticks(1:7)
@@ -267,7 +271,7 @@ errorbar(1:7,meanLDaveragelength,[],stdLDaveragelength,'k','linestyle','none');
 hold off
 
 %%
-figure('Name','Burstlength Probability Baseline vs. L-Dopa', 'Units','Normalized','Position',[0 0 1 1])
+figure('Name','Burstlength Probability Baseline vs. L-Dopa SEM', 'Units','Normalized','Position',[0 0 1 1])
 hold on
 
 kombiniert=[squeeze(mean(totalLDopaProb(:,2:end,:),3)) squeeze(mean(totalbaselineforplot,3))];
@@ -300,8 +304,8 @@ LDerrorbarx=[squeeze(mean(permute(totalLDopaProb(:,2:end,:),[3 1 2]),1)), squeez
 LDerrorbarx(:,2:2:end)=squeeze(mean(permute(totalLDopaProb(:,2:end,:),[3 1 2]),1));
 LDerrorbarx(:,1:2:end)=squeeze(mean(permute(totalbaselineforplot,[3 1 2]),1));
 LDerrorbary=[squeeze(std(permute(totalLDopaProb(:,2:end,:),[3 1 2]))), squeeze(std(permute(totalbaselineforplot,[3 1 2])))];
-LDerrorbary(:,2:2:end)=squeeze(std(permute(totalLDopaProb(:,2:end,:),[3 1 2])));
-LDerrorbary(:,1:2:end)=squeeze(std(permute(totalbaselineforplot,[3 1 2])));
+LDerrorbary(:,2:2:end)=(squeeze(std(permute(totalLDopaProb(:,2:end,:),[3 1 2]))))/sqrt(5);
+LDerrorbary(:,1:2:end)=(squeeze(std(permute(totalbaselineforplot,[3 1 2]))))/sqrt(5);
 for i=1:nbars
     x=(1:ngroups)-groupwidth/2+(2*i-1)*groupwidth/(2*nbars);
     

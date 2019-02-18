@@ -38,6 +38,7 @@ oben(i,:)=mittelwert(i,:)+SEM;
 unten(i,:)=mittelwert(i,:)-SEM;
 plot(x,mittelwert(i,:), 'Color', farben(i,:))
 
+
 jbfill(x,oben(i,:),unten(i,:),farben(i,:),farben(i,:),0,0.2);
 
 
@@ -50,7 +51,6 @@ ylabel('AUC fooofed log10(Power) - basline, 70-130 Hz')
 title('Mean of all animals ± SEM of FTG') 
 ylim([0 15])
 hold off
-
 
 
 
@@ -79,7 +79,7 @@ legend({'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21','AntA', 'Ant
 normalisation=nanmean(testfreq(:,4:7,1),2); % 50-130min freq der ersten ldopa injection für jedes tier
 testfreq=testfreq-normalisation;
 
-figure%subplot(2,3,3)
+subplot(2,3,3)
 hold on
 
 for i=1:size(wanted,1)

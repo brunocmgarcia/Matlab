@@ -1,4 +1,7 @@
-%%s190107_correlate_burst_ampAndLength
+%%s190107_correlate_burst_ampAndLength CAVE:100203: seltsamer wurm drin. 
+%%
+%%
+%%DO NOT USE.
 
 clear all
 clc
@@ -14,6 +17,7 @@ cd('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/b
 load key
 ordner=dir('*.mat');
 files={ordner.name}';
+
 farben=parula(7);
 
 TPmatrix=[TP101,TP104,TP110,TP116,TP121,TP300,TP400]';
@@ -36,36 +40,47 @@ for TP=1:7
         alllengthBL=[alllengthBL lengthLD];
         allmaxBL=[allmaxBL maxheightBL];
         allmaxLD=[allmaxLD maxheight];
+        meanlengthBL(i,TP)=mean(lengthBL,2);
+        meanlengthLD(i,TP)=mean(lengthLD,2);
     end
-    x=alllength;
-    y=allAUC;
-    
-    [n,c] = hist3([x', y'], 'Edges',{prctile(x,[2.5:95]);prctile(y,[2.5:95])});
-    
-   
-    
-    
-  %  figure(myscatter)
-  figure
-    hold on
-    contour(c{1},c{2},n)
-    scatter(x(1:20:end)',y(1:20:end)',1,'black','filled')
-    %scatter(allmaxLD,allAUC,5,farben(TP,:),'filled')
-    %scatter(allAUCBL,alllengthBL,5,'blue','filled')
-    hold off
-   % linearregression(alllength',allmaxLD','AUC','length',1)
-    allAUC=[];
-    alllength=[];
-    allAUCBL=[];
-    alllengthBL=[];
-    allmaxBL=[];
-    allmaxLD=[];
-    NanValues=[];
-    clearvars c n 
+%     x=alllength;
+%     y=allAUC;
+%     
+%     [n,c] = hist3([x', y'], 'Edges',{prctile(x,[2.5:95]);prctile(y,[2.5:95])});
+%     
+%    
+%     
+%     
+%   %  figure(myscatter)
+%   figure
+%     hold on
+%     contour(c{1},c{2},n)
+%     scatter(x(1:20:end)',y(1:20:end)',1,'black','filled')
+%     %scatter(allmaxLD,allAUC,5,farben(TP,:),'filled')
+%     %scatter(allAUCBL,alllengthBL,5,'blue','filled')
+%     hold off
+%    % linearregression(alllength',allmaxLD','AUC','length',1)
+%     allAUC=[];
+%     alllength=[];
+%     allAUCBL=[];
+%     alllengthBL=[];
+%     allmaxBL=[];
+%     allmaxLD=[];
+%     NanValues=[];
+%     clearvars c n 
 end
 
-for i=1:7
-    figure(i)
-    xlim([0 1])
-    ylim([0 10])
-end
+figure
+hold on
+plot(meanlengthBL,'b')
+plot(meanlengthLD,'r')
+
+hold off
+
+
+% 
+% for i=1:7
+%     figure(i)
+%     xlim([0 1])
+%     ylim([0 10])
+% end
