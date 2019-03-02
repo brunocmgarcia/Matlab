@@ -711,10 +711,10 @@ hold off
 
 clearvars x y
 
-%% burstPower X AIM
+%% burstPower X AIM % old version, do not use!
 load VAR_Global_AIM_matrix
 AIMforcorrelation=GlobalAIMmatrix([1 3 4 5 7],[2 3 5:12],[1 2 3 4 5 7 8])
-AIMforcorrelation=squeeze(mean(AIMforcorrelation(:,4:7,:),2));
+%AIMforcorrelation=squeeze(mean(AIMforcorrelation(:,4:7,:),2));
 x=LDaverageLength4corr(:,1:5);
 y=AIMforcorrelation(:,1:5);
 linearregression(x(:),y(:),'burst length','sum of aim',1)

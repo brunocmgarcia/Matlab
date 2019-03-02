@@ -161,7 +161,7 @@ ylim([-2 24])
 title('normalizedfreqXPower')
 
 
-linearregression(powerforcorrelation,AIMforcorrelation,'gamma power','global AIM',1);
+[~, ~, ~, ~, sR_powerXAim, sP_powerXaim]=linearregression(powerforcorrelation,AIMforcorrelation,'gamma power','global AIM',1);
 
 for i=1:length(TP)
     AIMforcorrelation=backupAIMforcorrelation(:,:,i);
@@ -183,6 +183,7 @@ end
 
 figure 
 bar(sR)
+rhoovertime=sP;
 xticklabels({'L-Dopa 01','L-Dopa 04','L-Dopa 10','L-Dopa 16','L-Dopa 21','AntA', 'AntB'})
 ylabel('spearman rho')
 title('spearmans rho over time') 
@@ -263,12 +264,12 @@ normalisation=nanmean(testfreq(:,4:7,1),2); % 50-130min freq der ersten ldopa in
 % normalisation=100;
 testfreq=testfreq-normalisation;
 
-scatter(reshape(testfreq(:,4:7,1:5),[],1),reshape(backupAIMforcorrelation(:,4:7,1:5),[],1),20,'o','filled','MarkerFaceColor',[.7 .7 .7],'MarkerEdgeColor',[.7 .7 .7])
-scatter(reshape(testfreq(:,4:7,6),[],1),reshape(backupAIMforcorrelation(:,4:7,6),[],1),'^','k','filled')
-scatter(reshape(testfreq(:,4:7,7),[],1),reshape(backupAIMforcorrelation(:,4:7,7),[],1),30,'s','k','filled')
+scatter(reshape(testfreq(:,4:7,1:5),[],1),reshape(backupAIMforcorrelation(:,4:7,1:5),[],1),40,'o','filled','MarkerFaceColor',[0 0 0],'MarkerEdgeColor',[.7 .7 .7])
+% scatter(reshape(testfreq(:,4:7,6),[],1),reshape(backupAIMforcorrelation(:,4:7,6),[],1),'^','k','filled')
+% scatter(reshape(testfreq(:,4:7,7),[],1),reshape(backupAIMforcorrelation(:,4:7,7),[],1),30,'s','k','filled')
 
 hold off
-legend({'L-Dopa','racloprid', 'halobenzazepine'})
+legend({'L-Dopa'})
 
 ylabel('Global AIM')
 xlabel('Frequency Verschiebung [Hz]')

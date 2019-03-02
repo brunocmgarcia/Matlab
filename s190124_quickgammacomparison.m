@@ -2,12 +2,11 @@
 
 clear all
 close all
+clc
+
 
 load('/Volumes/A_guettlec/Auswertung/00_LDopa_Paper/02a_NOreref_justM1_ds500/180/TFRsWithNaN/CG04_TP110_postLD180_ds_NOreref_m1TFRhannArtCorr.mat')
- 
-
-
-    my_foi=TFRhann.freq;
+my_foi=TFRhann.freq;
     
 
     time=TFRhann.time';
@@ -134,6 +133,5 @@ xlim([10 (140)])
     hold off
     
     
-    
-    
+   
     

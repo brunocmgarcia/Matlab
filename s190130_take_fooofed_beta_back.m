@@ -132,7 +132,7 @@ hold off
 ylim([-2 21])
 
 
-close all
+% close all
 %for i=1:5
 
 x=BLauc(:,:);
