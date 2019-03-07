@@ -57,64 +57,76 @@ farben=hot(10);
 for i=1:10
 subplot(1,5,1)
 
-plot(log10(squeeze(nanmean(lifetime(1,:,i,:),2))),'Color','k')
-xticks([1:2:29])
-xticklabels(times(2:2:30))
-ylim([-4 0])
-xlim([1 15])
-legend(times2{i},'Location','northeast')
-axis square
-title('l-dopa 1')
-xlabel('life-time [ms]')
-ylabel('log10(P(life-time))')
+a=(squeeze(nanmean(lifetime(1,:,i,:),2)));
+b=(logspace(-1,0,11)'*1000);
+b=10.^((log10(b(1:end-1))+log10(b(2:end)))./2);  %logar. bin mitte
+%b=((b(1:end-1))+(b(2:end)))./2; %lineare bin mitte
+loglog(b,a); hold on; scatter(b,a); hold off
+xticks([167 333 528 837])
+xlim([100 1000])
+hold on
 
-subplot(1,5,2)
-plot(log10(squeeze(nanmean(lifetime(2,:,i,:),2))),'Color','k')
-xticks([1:2:29])
-xticklabels(times(2:2:30))
-ylim([-4 0])
-xlim([1 15])
-legend(times2{i},'Location','northeast')
-axis square
-title('l-dopa 4')
-xlabel('life-time [ms]')
-ylabel('log10(P(life-time))')
+x=b; y=a;
 
-subplot(1,5,3)
-plot(log10(squeeze(nanmean(lifetime(3,:,i,:),2))),'Color','k')
-xticks([1:2:29])
-xticklabels(times(2:2:30))
-ylim([-4 0])
-xlim([1 15])
-legend(times2{i},'Location','northeast')
-axis square
-title('l-dopa 10')
-xlabel('life-time [ms]')
-ylabel('log10(P(life-time))')
+b=log10(b);
+a=log10(a);
 
-subplot(1,5,4)
-plot(log10(squeeze(nanmean(lifetime(4,:,i,:),2))),'Color','k')
-xticks([1:2:29])
-xticklabels(times(2:2:30))
-ylim([-4 0])
-xlim([1 15])
-legend(times2{i},'Location','northeast')
-axis square
-title('l-dopa 16')
-xlabel('life-time [ms]')
-ylabel('log10(P(life-time))')
 
-subplot(1,5,5)
-plot(log10(squeeze(nanmean(lifetime(5,:,i,:),2))),'Color','k')
-xticks([1:2:29])
-xticklabels(times(2:2:30))
-ylim([-4 0])
-xlim([1 15])
-legend(times2{i},'Location','northeast')
-axis square
-title('l-dopa 21')
-xlabel('life-time [ms]')
-ylabel('log10(P(life-time))')
+b(isinf(a))=[];
+a(isinf(a))=[];
+beta=(b\a);
+offset=([ones(numel(b'),1) b]\a);
+plot(10.^(b),10.^((offset(2)*b+offset(1))))
+legend(sprintf('Formula: y=10^(%fx)+%f)',offset(2),offset(1)))
+hold off
+
+% subplot(1,5,2)
+% plot(log10(squeeze(nanmean(lifetime(2,:,i,:),2))),'Color','k')
+% xticks([1:2:29])
+% xticklabels(times(2:2:30))
+% ylim([-4 0])
+% xlim([1 15])
+% legend(times2{i},'Location','northeast')
+% axis square
+% title('l-dopa 4')
+% xlabel('life-time [ms]')
+% ylabel('log10(P(life-time))')
+% 
+% subplot(1,5,3)
+% plot(log10(squeeze(nanmean(lifetime(3,:,i,:),2))),'Color','k')
+% xticks([1:2:29])
+% xticklabels(times(2:2:30))
+% ylim([-4 0])
+% xlim([1 15])
+% legend(times2{i},'Location','northeast')
+% axis square
+% title('l-dopa 10')
+% xlabel('life-time [ms]')
+% ylabel('log10(P(life-time))')
+% 
+% subplot(1,5,4)
+% plot(log10(squeeze(nanmean(lifetime(4,:,i,:),2))),'Color','k')
+% xticks([1:2:29])
+% xticklabels(times(2:2:30))
+% ylim([-4 0])
+% xlim([1 15])
+% legend(times2{i},'Location','northeast')
+% axis square
+% title('l-dopa 16')
+% xlabel('life-time [ms]')
+% ylabel('log10(P(life-time))')
+% 
+% subplot(1,5,5)
+% plot(log10(squeeze(nanmean(lifetime(5,:,i,:),2))),'Color','k')
+% xticks([1:2:29])
+% xticklabels(times(2:2:30))
+% ylim([-4 0])
+% xlim([1 15])
+% legend(times2{i},'Location','northeast')
+% axis square
+% title('l-dopa 21')
+% xlabel('life-time [ms]')
+% ylabel('log10(P(life-time))')
 
 drawnow
 % frame=getframe(h);
@@ -175,16 +187,19 @@ end
 % set(gca,'XScale','log','YScale','log')
 %%
 
-a=(squeeze(nanmean(lifetime(1,:,1,:),2)));
+a=(squeeze(nanmean(lifetime(3,:,1,:),2)));
 b=(logspace(-1,0,11)'*1000);
-b=10.^((log10(b(1:end-1))+log10(b(2:end)))./2);  %logar. bin mitte
+b=round(b(2:end)); % billo variante
+%b=10.^((log10(b(1:end-1))+log10(b(2:end)))./2);  %logar. bin mitte
 %b=((b(1:end-1))+(b(2:end)))./2; %lineare bin mitte
-figure; loglog(b,a); hold on; scatter(b,a); hold off
-xticks([167 333 528 837])
-xlim([100 1000])
-hold on
+figure; 
+subplot(1,3,3); loglog(b,a); hold on; scatter(b,a); hold off; xlim([0 1000]); xticks(b)
+subplot(1,3,1); plot(b,a); hold on; scatter(b,a); hold off; xlim([0 1000]); xticks(b)
+subplot(1,3,2); semilogy(b,a); hold on; scatter(b,a); hold off; xlim([0 1000]); xticks(b)
 
-x=b; y=a;
+
+
+% x=b; y=a;
 
 b=log10(b);
 a=log10(a);

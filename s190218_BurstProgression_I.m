@@ -70,6 +70,7 @@ clearvars -except burststruct
 close all
 allLD=[1 2 4 5 7 8 9; 23 24 26 28 30 32 33; 35 36 38 40 42 44 45; 47 48 50 51 52 54 55; 66 67 69 70 71 73 74]';
 starttimes=[];
+
 height=[];
 length=[];
 AUC=[];
@@ -396,7 +397,7 @@ totalforcorrlabels={'highest','lowest','longest','shortest','power','freq','AIM'
 totalforcorr=totalforcorr(all(~isnan(totalforcorr),2),:);
 [pca_COEFF, pca_SCORE, pca_LATENT, pca_TSQUARED, pca_EXPLAINED, pca_MU] = pca(zscore(totalforcorr(:,[1:6])));
 subplot(1,2,1)
-biplot(pca_COEFF(:,1:3),'Scores',pca_SCORE(:,1:3),'Varlabels',totalforcorrlabels(1,[1:6]))
+biplot(pca_COEFF(:,[1 2 6]),'Scores',pca_SCORE(:,[1 2 6]),'Varlabels',totalforcorrlabels(1,[1:6]))
 subplot(1,2,2)
 colorcode=totalforcorr(:,7);
 %colorcode=colorcode./max(colorcode);
@@ -404,7 +405,7 @@ colorcode(colorcode<=3)=0;
 colorcode(colorcode>3)=1;
 colormap(prism)
 
- scatter3(pca_SCORE(:,1),pca_SCORE(:,2),pca_SCORE(:,3),40,colorcode,'filled')
+ scatter3(pca_SCORE(:,1),pca_SCORE(:,2),pca_SCORE(:,6),40,colorcode,'filled')
 
 
 % colorcode(colorcode==0)=0;
@@ -507,6 +508,35 @@ for cutoff=[0 3]
         figure('Name',sprintf('pure %s for AIM>%i, nboot 1000', totalforcorrlabels{1,i},cutoff))
         subplot(1,2,1)
         hold on
+        plot(roc_x(:,2:3), roc_y(:,2:3),'Color',[.5 .5 .5]) % ci
+        plot(roc_x(:,1), roc_y(:,1),'k') % mean
+        plot([0 1],[roc_optrocpt(2) roc_optrocpt(2)],'k')
+        plot([roc_optrocpt(1) roc_optrocpt(1)],[0 1],'k')
+        legend(num2str(roc_AUC),'Location','best')
+        xlabel('false positive rate (1-specificity)'); ylabel('true positive rate (sensitivity)')
+        xlim([0 1]); ylim([0 1]); axis tight; axis square
+        hold off
+        subplot(1,2,2)
+        plot(roc_x(:,1), roc_t)
+        legend(sprintf('sens: %.2f spez: %.2f',(1-roc_optrocpt(1))*100,(roc_optrocpt(2))*100),'Location','best')
+        xlabel('false positive rate (1-specificity)'); ylabel('threshold')
+        axis tight; axis square
+        hold off
+
+    end
+end
+
+for cutoff=[0 3]
+    colorcode=totalforcorr(:,7);
+    colorcode(colorcode<=cutoff)=0;
+    colorcode(colorcode>cutoff)=1;
+   
+        clearvars roc_x roc_y roc_t roc_AUC roc_optrocpt
+        [roc_x, roc_y,roc_t, roc_AUC, roc_optrocpt]=perfcurve(colorcode,pca_SCORE(:,1),1,'nboot',1000);
+        figure('Name',sprintf('pure PCA1 for AIM>%i, nboot 1000',cutoff))
+
+        subplot(1,2,1)
+        hold on
         plot(roc_x(:,2:3), roc_y(:,2:3),'b') % ci
         plot(roc_x(:,1), roc_y(:,1),'r') % mean
         legend(num2str(roc_AUC),'Location','best')
@@ -519,34 +549,35 @@ for cutoff=[0 3]
         xlabel('false positive rate (1-specificity)'); ylabel('threshold')
         axis tight
         hold off
-
-    end
+        
 end
 
-%% ROC GLM with PCA1 : PCA4 for AIM>0 OLD VERSION, No validation!
-clearvars glm_partition glm_scores glm_scores2 glm_final glm_X glm_Y glm_T glm_AUC glm_optrocpt colorcode glm_pred glm_resp
 
-colorcode=totalforcorr(:,7); 
-colorcode(colorcode<=0)=0;
-colorcode(colorcode>0)=1; % colorcode now is 1 for every AIM > 0 and 0 if aim is 0
-glm_pred=pca_SCORE(:,1:4); % predictors are PC1 through 4 (of 6)
-glm_resp=colorcode; 
-glm_mdl=fitglm(glm_pred,glm_resp,'Distribution','Binomial','Link','logit');
-glm_scores=glm_mdl.Fitted.Probability; % same as predict scores from trained with all and tested on all. 
-glm_scores2=predict(fitglm(glm_pred,glm_resp,'Distribution','Binomial','Link','logit'), glm_pred);
-[glm_X, glm_Y, glm_T, glm_AUC, glm_optrocpt]=perfcurve(colorcode,glm_scores,1); % 'nboot' 100 bootstrapping here instead of val?
-figure
-title('GLM with PC1:4 for AIM>0')
-subplot(1,2,1)
-hold on
-plot(glm_X, glm_Y)
-legend(num2str(glm_AUC),'Location','best')
-hold off
-subplot(1,2,2)
-plot(glm_X, glm_T)
-legend(sprintf('sens: %.2f spez: %.2f',(1-glm_optrocpt(1))*100,(glm_optrocpt(2))*100),'Location','best')
 
-%% ROC GLM with PCA1 : PCA3 for AIM0-5 mit training test split kfold 10 oder leaveout 1
+% %% ROC GLM with PCA1 : PCA4 for AIM>0 OLD VERSION, No validation!
+% clearvars glm_partition glm_scores glm_scores2 glm_final glm_X glm_Y glm_T glm_AUC glm_optrocpt colorcode glm_pred glm_resp
+% 
+% colorcode=totalforcorr(:,7); 
+% colorcode(colorcode<=0)=0;
+% colorcode(colorcode>0)=1; % colorcode now is 1 for every AIM > 0 and 0 if aim is 0
+% glm_pred=pca_SCORE(:,1:4); % predictors are PC1 through 4 (of 6)
+% glm_resp=colorcode; 
+% glm_mdl=fitglm(glm_pred,glm_resp,'Distribution','Binomial','Link','logit');
+% glm_scores=glm_mdl.Fitted.Probability; % same as predict scores from trained with all and tested on all. 
+% glm_scores2=predict(fitglm(glm_pred,glm_resp,'Distribution','Binomial','Link','logit'), glm_pred);
+% [glm_X, glm_Y, glm_T, glm_AUC, glm_optrocpt]=perfcurve(colorcode,glm_scores,1); % 'nboot' 100 bootstrapping here instead of val?
+% figure
+% title('GLM with PC1:4 for AIM>0')
+% subplot(1,2,1)
+% hold on
+% plot(glm_X, glm_Y)
+% legend(num2str(glm_AUC),'Location','best')
+% hold off
+% subplot(1,2,2)
+% plot(glm_X, glm_T)
+% legend(sprintf('sens: %.2f spez: %.2f',(1-glm_optrocpt(1))*100,(glm_optrocpt(2))*100),'Location','best')
+
+%% ROC GLM with PCA1 : PCA4 for AIM0-3 mit training test split kfold 10 oder leaveout 1
 for cutoff=0:3
 clearvars glm_partition glm_final glm_X glm_Y glm_T glm_AUC glm_optrocpt colorcode glm_pred glm_resp
 colorcode=totalforcorr(:,7);
@@ -569,7 +600,7 @@ end
 
 [glm_X, glm_Y, glm_T, glm_AUC, glm_optrocpt]=perfcurve(glm_final(1,:),glm_final(2,:),1); % kein bootstrap sonder alle k-folds
 
-figure('Name',sprintf('GLM with PC1:3 for AIM>%i, validation type=%s, testsets=%i',cutoff,glm_partition.Type, glm_partition.NumTestSets))
+figure('Name',sprintf('GLM with PC1:4 for AIM>%i, validation type=%s, testsets=%i',cutoff,glm_partition.Type, glm_partition.NumTestSets))
 subplot(1,2,1)
 hold on
 plot(glm_X(:,2:3), glm_Y(:,2:3),'b') % ci
@@ -670,7 +701,7 @@ axis tight
 drawnow
 end
 
-%% partial corrected correlation
+%% partial corrected correlation all params
 clc
 clearvars pcc_total pcc_rho pcc_pval pcc_possiblecomb pcc_pval_temp pcc_rho_temp zeroorder_rho zeroorder_p
 pcc_possiblecomb=nchoosek([1 2 3 4 5 6 8 9],2);
@@ -717,7 +748,205 @@ for i=1:size(pcc_possiblecomb,1)
 %     disp(pcc_total{i,2})
 end
 
+%% partial corrected correlation PCs
+clc
+clearvars pcc_total pcc_rho pcc_pval pcc_possiblecomb pcc_pval_temp pcc_rho_temp zeroorder_rho zeroorder_p
+counter=0;
+for i=1:6
+    for ii=1:6
+         if i~=ii
+            counter=counter+1;
+            pcc_possiblecomb(counter,1)=i;      
+            pcc_possiblecomb(counter,2)=ii;
+         end
+    end
+end
 
+
+for i=1:size(pcc_possiblecomb,1)
+    [pcc_rho, pcc_pval]=partialcorr([pca_SCORE(:,pcc_possiblecomb(i,1)) pca_SCORE(:,pcc_possiblecomb(i,2)) totalforcorr(:,7)],'Type','Spearman','Rows','complete');
+    [zeroorder_rho, zeroorder_p]=corr([pca_SCORE(:,pcc_possiblecomb(i,1)) totalforcorr(:,7)],'Type','Spearman','Rows','complete');
+     
+    
+    
+%     
+%     pcc_rho=array2table(pcc_rho,'VariableNames',totalforcorrlabels([pcc_possiblecomb(i,1), pcc_possiblecomb(i,2), 7]),'RowNames',totalforcorrlabels([pcc_possiblecomb(i,1), pcc_possiblecomb(i,2), 7]));
+%     pcc_pval=array2table(pcc_pval,'VariableNames',totalforcorrlabels([pcc_possiblecomb(i,1), pcc_possiblecomb(i,2), 7]),'RowNames',totalforcorrlabels([pcc_possiblecomb(i,1), pcc_possiblecomb(i,2), 7]));
+%     
+        
+%     
+%     pcc_total(i,1)={pcc_rho};
+%     pcc_total(i,2)={pcc_pval};
+      pcc_total(i,1)={'rho:'};
+      pcc_total(i,2)={round(pcc_rho(1,3),3)};
+      pcc_total(i,3)={'p-value:'};
+      pcc_total(i,4)={round(pcc_pval(1,3),3)};
+      pcc_total(i,5)={['aim X PC' num2str(pcc_possiblecomb(i,1))]};
+      pcc_total(i,6)={['corrected for PC' num2str(pcc_possiblecomb(i,2))]};
+      pcc_total(i,7)={'zero order corr:'};
+      pcc_total(i,8)={'rho:'};
+      pcc_total(i,9)={round(zeroorder_rho(1,2),3)};
+      pcc_total(i,10)={'p-value:'};
+      pcc_total(i,11)={round(zeroorder_p(1,2),3)};
+      pcc_total(i,12)={'0-order minus partial rho:'};
+      pcc_total(i,13)={round(pcc_total{i,9},3)-round(pcc_total{i,2},3)};
+%   
+    
+%     disp(pcc_total{i,2})
+end
+
+%% ranked selection approach for PC1:6 --> GLM
+clc
+clearvars pcc_total pcc_rho_b pcc_pval_b pcc_rho others included_PCs_doublecheck included_PCs reihenfolge pcc_pval pcc_possiblecomb pcc_pval_temp pcc_rho_temp zeroorder_rho zeroorder_p
+counter=0;
+for i=1:size(pca_SCORE,2)
+    [zeroorder_rho(i), zeroorder_p(i)]=corr(pca_SCORE(:,i), totalforcorr(:,7),'Type','Spearman','Rows','complete');
+end
+
+[~, reihenfolge]=sort(abs(zeroorder_rho),'descend');
+
+% reihenfolge ist jetzt absteigend die zeroordercorr von PCs.
+% weiteres vorgehen: stepwise reinnehmen solange p>0.05 bleibt wenn
+% korrigiert wird für das, das schon drin ist. 
+included_PCs=[reihenfolge(1)];
+for i=2:6 % den ersten braucht man ja nicht
+    included_PCs=[included_PCs reihenfolge(i)];
+    [pcc_rho(i-1), pcc_pval(i-1)]=partialcorr(pca_SCORE(:,reihenfolge(i)), totalforcorr(:,7), pca_SCORE(:,included_PCs(1:end-1)),'Type','Spearman','Rows','complete');
+    if pcc_pval(i-1)>.05
+        included_PCs=included_PCs(1:end-1);
+    end
+end
+included_PCs_doublecheck=[];
+for i=1:size(included_PCs,2)
+    included_PCs_doublecheck=[included_PCs_doublecheck included_PCs(i)];
+    others=[1:size(included_PCs,2)];
+    others=others(find(others~=i));
+    [pcc_rho_b(i), pcc_pval_b(i)]=partialcorr(pca_SCORE(:,included_PCs(i)), totalforcorr(:,7), pca_SCORE(:,included_PCs(others)),'Type','Spearman','Rows','complete');
+    if pcc_pval_b(i)>.05
+        included_PCs_doublecheck=included_PCs_doublecheck(1:end-1);
+    end
+end
+
+
+for cutoff=0:3
+clearvars glm_partition glm_final glm_X glm_Y glm_T glm_AUC glm_optrocpt colorcode glm_pred glm_resp
+colorcode=totalforcorr(:,7);
+colorcode(colorcode<=cutoff)=0;
+colorcode(colorcode>cutoff)=1;
+glm_pred=pca_SCORE(:,included_PCs_doublecheck);
+glm_resp=colorcode;
+
+rng(666)
+glm_partition=cvpartition(size(glm_resp,1),'k',10);
+% rng(666)
+% glm_partition=cvpartition(size(glm_resp,1),'LeaveOut');
+
+
+for i=1:glm_partition.NumTestSets
+    glm_final(1,i)={glm_resp(test(glm_partition,i))};
+    glm_final(2,i)={predict(fitglm(glm_pred(training(glm_partition,i),:),glm_resp(training(glm_partition,i)),'Distribution','Binomial','Link','logit'), glm_pred(test(glm_partition,i),:))};
+    
+end
+
+[glm_X, glm_Y, glm_T, glm_AUC, glm_optrocpt]=perfcurve(glm_final(1,:),glm_final(2,:),1); % kein bootstrap sonder alle k-folds
+
+figure('Name',sprintf('GLM with partl. corr. selected PCs for AIM>%i, validation type=%s, testsets=%i',cutoff,glm_partition.Type, glm_partition.NumTestSets))
+subplot(1,2,1)
+hold on
+plot(glm_X(:,2:3), glm_Y(:,2:3),'Color',[.5 .5 .5]) % ci
+plot(glm_X(:,1), glm_Y(:,1),'k') % mean
+plot([0 1],[glm_optrocpt(2) glm_optrocpt(2)],'k')
+plot([glm_optrocpt(1) glm_optrocpt(1)],[0 1],'k')
+legend(num2str(glm_AUC),'Location','best')
+xlabel('false positive rate (1-specificity)'); ylabel('true positive rate (sensitivity)')
+xlim([0 1]); ylim([0 1]); axis tight; axis square
+hold off
+subplot(1,2,2)
+plot(glm_X(:,1), glm_T)
+legend(sprintf('sens: %.2f spez: %.2f',(1-glm_optrocpt(1))*100,(glm_optrocpt(2))*100),'Location','best')
+xlabel('false positive rate (1-specificity)'); ylabel('threshold')
+axis tight; axis square
+drawnow
+end
+%% ranked selection approach for all param --> GLM
+clc
+clearvars pcc_total pcc_rho_b pcc_pval_b pcc_rho others included_PCs_doublecheck included_PCs reihenfolge pcc_pval pcc_possiblecomb pcc_pval_temp pcc_rho_temp zeroorder_rho zeroorder_p
+totalforcorr_pred=totalforcorr(:,[1 2 3 4 5 6 8 9]);
+totalforcorr_res=totalforcorr(:,7);
+totalforcorr_pred_label=totalforcorrlabels(:,[1 2 3 4 5 6 8 9]);
+totalforcorr_res_label=totalforcorrlabels(:,7);
+counter=0;
+for i=1:size(totalforcorr_pred,2)
+    [zeroorder_rho(i), zeroorder_p(i)]=corr(totalforcorr_pred(:,i), totalforcorr_res,'Type','Spearman','Rows','complete');
+end
+
+[~, reihenfolge]=sort(abs(zeroorder_rho),'descend');
+%totalforcorr_pred_label{reihenfolge}
+
+% reihenfolge ist jetzt absteigend die zeroordercorr von params..
+% weiteres vorgehen: stepwise reinnehmen solange p>0.05 bleibt wenn
+% korrigiert wird für das, das schon drin ist. 
+included_PCs=[reihenfolge(1)];
+for i=2:size(totalforcorr_pred,2) % den ersten braucht man ja nicht
+    included_PCs=[included_PCs reihenfolge(i)];
+    [pcc_rho(i-1), pcc_pval(i-1)]=partialcorr(totalforcorr_pred(:,reihenfolge(i)), totalforcorr_res, totalforcorr_pred(:,included_PCs(1:end-1)),'Type','Spearman','Rows','complete');
+    if pcc_pval(i-1)>.05
+        included_PCs=included_PCs(1:end-1);
+    end
+end
+included_PCs_doublecheck=[]; 
+% jetzt nochmal die die drin sind untereinander 
+% checken ob etwas verworfen werden kann --> wird für ein parameter
+% das p grösser 0.05 wenn ich für die anderen werte korrigiere?
+for i=1:size(included_PCs,2)
+    included_PCs_doublecheck=[included_PCs_doublecheck included_PCs(i)];
+    others=[1:size(included_PCs,2)];
+    others=others(find(others~=i));
+    [pcc_rho_b(i), pcc_pval_b(i)]=partialcorr(totalforcorr_pred(:,included_PCs(i)), totalforcorr_res, totalforcorr_pred(:,included_PCs(others)),'Type','Spearman','Rows','complete');
+    if pcc_pval_b(i)>.05
+        included_PCs_doublecheck=included_PCs_doublecheck(1:end-1);
+    end
+end
+
+
+for cutoff=0:3
+clearvars glm_partition glm_final glm_X glm_Y glm_T glm_AUC glm_optrocpt colorcode glm_pred glm_resp
+colorcode=totalforcorr(:,7);
+colorcode(colorcode<=cutoff)=0;
+colorcode(colorcode>cutoff)=1;
+glm_pred=totalforcorr_pred(:,included_PCs_doublecheck);
+glm_resp=colorcode;
+
+% rng(666)
+% glm_partition=cvpartition(size(glm_resp,1),'k',10);
+rng(666)
+glm_partition=cvpartition(size(glm_resp,1),'LeaveOut');
+
+
+for i=1:glm_partition.NumTestSets
+    glm_final(1,i)={glm_resp(test(glm_partition,i))};
+    glm_final(2,i)={predict(fitglm(glm_pred(training(glm_partition,i),:),glm_resp(training(glm_partition,i)),'Distribution','Binomial','Link','logit'), glm_pred(test(glm_partition,i),:))};
+    
+end
+
+[glm_X, glm_Y, glm_T, glm_AUC, glm_optrocpt]=perfcurve(glm_final(1,:),glm_final(2,:),1); % kein bootstrap sonder alle k-folds
+
+figure('Name',sprintf('GLM with partl. corr. selected params for AIM>%i, validation type=%s, testsets=%i',cutoff,glm_partition.Type, glm_partition.NumTestSets))
+subplot(1,2,1)
+hold on
+plot(glm_X(:,2:3), glm_Y(:,2:3),'b') % ci
+plot(glm_X(:,1), glm_Y(:,1),'r') % mean
+legend(num2str(glm_AUC),'Location','best')
+xlabel('false positive rate (1-specificity)'); ylabel('true positive rate (sensitivity)')
+xlim([0 1]); ylim([0 1]); axis tight
+hold off
+subplot(1,2,2)
+plot(glm_X(:,1), glm_T)
+legend(sprintf('sens: %.2f spez: %.2f',(1-glm_optrocpt(1))*100,(glm_optrocpt(2))*100),'Location','best')
+xlabel('false positive rate (1-specificity)'); ylabel('threshold')
+axis tight
+drawnow
+end
 
 
 %% über zeit, alle nur ldopa.

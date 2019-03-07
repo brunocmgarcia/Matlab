@@ -134,13 +134,13 @@ powerforcorrelation=powerforcorrelation(:);
 freqforcorrelation=freqforcorrelation(:,:,1:5);
 normfreqforcorrelation=normfreqforcorrelation(:,:,1:5);
 
-linearregression(powerforcorrelation,freqforcorrelation(:),'ftg power', 'meanfreq',1)
-hold on
-scatter(powerforcorrelation,freqforcorrelation(:),40,'o','filled','MarkerFaceColor',[0 0 0],'MarkerEdgeColor',[.7 .7 .7])
-
-hold off
-ylim([80 120])
-xlim([-2 24])
+% linearregression(powerforcorrelation,freqforcorrelation(:),'ftg power', 'meanfreq',1)
+% hold on
+% scatter(powerforcorrelation,freqforcorrelation(:),40,'o','filled','MarkerFaceColor',[0 0 0],'MarkerEdgeColor',[.7 .7 .7])
+% 
+% hold off
+% ylim([80 120])
+% xlim([-2 24])
 
 linearregression(freqforcorrelation(:),powerforcorrelation, 'meanfreq','ftg power',1)
 hold on
@@ -149,19 +149,20 @@ scatter(freqforcorrelation(:),powerforcorrelation,40,'o','filled','MarkerFaceCol
 hold off
 
 xlim([80 120])
-ylim([-2 24])
+ylim([0 25])
 
 linearregression(normfreqforcorrelation(:),powerforcorrelation, 'meanfreqverschiebung','ftg power',1)
 hold on
 scatter(normfreqforcorrelation(:),powerforcorrelation,40,'o','filled','MarkerFaceColor',[0 0 0],'MarkerEdgeColor',[.7 .7 .7])
 
 hold off
-xlim([-10 40])
-ylim([-2 24])
+xlim([-5 25])
+ylim([0 25])
 title('normalizedfreqXPower')
 
 
 [~, ~, ~, ~, sR_powerXAim, sP_powerXaim]=linearregression(powerforcorrelation,AIMforcorrelation,'gamma power','global AIM',1);
+hold on; scatter(powerforcorrelation,AIMforcorrelation,40,'o','filled','MarkerFaceColor',[0 0 0],'MarkerEdgeColor',[.7 .7 .7]); hold off;
 
 for i=1:length(TP)
     AIMforcorrelation=backupAIMforcorrelation(:,:,i);
@@ -249,7 +250,8 @@ ylabel('Global AIM')
 xlabel('Frequency [Hz]')
 title('AIM vs frequency') 
 
-linearregression(reshape(testfreq(:,4:7,1:7),[],1),(reshape(backupAIMforcorrelation(:,4:7,1:7),[],1)),'Frequency Verschiebung [Hz]','Global AIM',1)
+linearregression(reshape(testfreq(:,4:7,1:5),[],1),(reshape(backupAIMforcorrelation(:,4:7,1:5),[],1)),'Frequency [Hz]','Global AIM',1)
+hold on; scatter(reshape(testfreq(:,4:7,1:5),[],1),(reshape(backupAIMforcorrelation(:,4:7,1:5),[],1)),40,'o','filled','MarkerFaceColor',[0 0 0],'MarkerEdgeColor',[.7 .7 .7]); hold off
 
 %% AIM vs freqverschiebung
 figure
@@ -275,8 +277,10 @@ ylabel('Global AIM')
 xlabel('Frequency Verschiebung [Hz]')
 title('AIM vs frequency') 
 
-linearregression(reshape(testfreq(:,4:7,1:7),[],1),(reshape(backupAIMforcorrelation(:,4:7,1:7),[],1)),'Frequency Verschiebung [Hz]','Global AIM',1)
-
+linearregression(reshape(testfreq(:,4:7,1:5),[],1),(reshape(backupAIMforcorrelation(:,4:7,1:5),[],1)),'Frequency Verschiebung [Hz]','Global AIM',1)
+hold on; scatter(reshape(testfreq(:,4:7,1:5),[],1),(reshape(backupAIMforcorrelation(:,4:7,1:5),[],1)),40,'o','filled','MarkerFaceColor',[0 0 0],'MarkerEdgeColor',[.7 .7 .7]); hold off
+xlim([-5 25])
+ylim([0 40])
 
 
 
