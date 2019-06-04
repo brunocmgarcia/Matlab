@@ -580,7 +580,7 @@ for file_i=1:length(baselineschluessel)
     plot(1:length(ausschnitt),P75rs_curve(rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2)):rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))+1500), 'Color', 'r')
     title('abs(hilbert) and ztransform')
 
-    ylim([-3 3])
+    ylim([-8 8])
 
     hold off
 
@@ -592,7 +592,7 @@ for file_i=1:length(baselineschluessel)
     jbfill(1:1500,jbdatrectsmoothsub((rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))):rs_NumBlockStart(ceil(length(rs_NumBlockStart)/2))+1499),zeros(1500,1)');
     title('bursts')
 
-    ylim([0 3])
+    ylim([0 8])
 
     hold off
 
