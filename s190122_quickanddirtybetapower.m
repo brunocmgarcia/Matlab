@@ -1,5 +1,5 @@
 clearvars
-cd('E:\Auswertung\noreref500hzforbeta\ds\trialappend\selected')
+cd('C:\Users\bruno\Documents\LR3\4bruno\4bruno')
 
     
 Liste=dir('*Ruhe*');
@@ -14,13 +14,14 @@ for datei_i=1:length(Liste)
     cfg.length=2;
     data = ft_redefinetrial(cfg, data);  
     for i=1:length(data.trial) 
-            welch(:,:,i)=(data.trial{1,i}')/800;
-            [pxx(:,:,i), welch_freq(:,1)]=(pwelch(welch(:,:,i), hanning(100), [], 2048, 500, 'psd'));  % mit hanning statt hamming
+            welch(:,:,i)=(data.trial{1,i}')/800; 
+            [pxx(:,:,i), welch_freq(:,1)]=(pwelch(welch(:,:,i), hanning(100), [], 2048, 2000, 'psd'));  % mit hanning statt hamming 
+
     end
     welch=pxx;
 	clearvars pxx
-	welch_average=mean(welch,3);
-    totalaverage(datei_i,:)= welch_average;   
+	welch_average=mean(welch,3); %averaging all trials in each channel
+    totalaverage(datei_i,:)= mean(welch_average,2); %averaging all channels together
 %         h=s171109_normalizegame(welch_average, welch_freq)
 %     uiwait(h)
 %       
@@ -30,11 +31,11 @@ for datei_i=1:length(Liste)
     [c norm_index_oben1] = min(abs(welch_freq-65));
     clearvars c
     
-    [c norm_index_unten2] = min(abs(welch_freq-60));
-    [c norm_index_oben2] = min(abs(welch_freq-65));
-    clearvars c
+%     [c norm_index_unten2] = min(abs(welch_freq-60));
+%     [c norm_index_oben2] = min(abs(welch_freq-65));
+%     clearvars c
     
-    normfaktor=mean(welch_average([norm_index_unten1:norm_index_oben1 norm_index_unten2:norm_index_oben2],:));
+    normfaktor=mean(welch_average([norm_index_unten1:norm_index_oben1],:));
     
 %     
 % % %  variante mit 1/f^2 scaling   
@@ -46,7 +47,7 @@ for datei_i=1:length(Liste)
 %     
     welch_average_norm= bsxfun(@rdivide, welch_average, normfaktor);
      welch_average=(welch_average_norm);
-      totalaveragenorm(datei_i,:)= welch_average;  
+      totalaveragenorm(datei_i,:)= mean(welch_average,2);  
        
 %         plot(welch_freq,welch_average(:,:))
 %           title(aktuelle_datei{1,1}(1:14), 'Interpreter', 'none', 'FontSize', 8)  
@@ -75,8 +76,8 @@ end
 
 figure
 hold on
-plot(welch_freq,mean(totalaveragenorm([1 5 7 9   13],:),1))
-plot(welch_freq,mean(totalaveragenorm([2 6 8 10  14],:),1))
+plot(welch_freq,totalaveragenorm(1,:))
+plot(welch_freq,totalaveragenorm(2,:))
 
 hold off
 ylim([0 20])
@@ -84,8 +85,8 @@ xlim([10 80])
 
 figure
 hold on
-plot(repmat(welch_freq,[1,5]),(totalaveragenorm([1 5 7 9   13],:))','r')
-plot(repmat(welch_freq,[1,5]),(totalaveragenorm([2 6 8 10  14],:))','b')
+plot(repmat(welch_freq,[1,]),(totalaveragenorm(1,:))','r')
+plot(repmat(welch_freq,[1,1]),(totalaveragenorm(2,:))','b')
 
 hold off
 ylim([0 20])
@@ -93,8 +94,8 @@ xlim([10 80])
 
 figure
 hold on
-plot(repmat(welch_freq,[1,5]),(totalaverage([1 5 7 9   13],:))','r')
-plot(repmat(welch_freq,[1,5]),(totalaverage([2 6 8 10  14],:))','b')
+plot(repmat(welch_freq,[1,1]),(totalaverage([1],:))','r')
+plot(repmat(welch_freq,[1,1]),(totalaverage([2],:))','b')
 
 hold off
 ylim([0 20])
@@ -102,7 +103,7 @@ xlim([10 80])
 
 
 figure
-plot(welch_freq,mean(totalaveragenorm([2:2:14],:),1)./mean(totalaveragenorm([1:2:14],:),1))
+plot(welch_freq,totalaveragenorm(2,:)./totalaveragenorm(1,:))
 
 
 
