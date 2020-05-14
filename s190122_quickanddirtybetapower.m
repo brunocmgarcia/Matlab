@@ -21,7 +21,10 @@ for datei_i=1:length(Liste)
     welch=pxx;
 	clearvars pxx
 	welch_average=mean(welch,3); %averaging all trials in each channel
-    totalaverage(datei_i,:)= mean(welch_average,2); %averaging all channels together
+    %totalaverage(datei_i,:)= mean(welch_average,2);%averaging all channels
+    totalaverageSTR(datei_i,:)= mean(welch_average(:,[1:15]),2); %averaging all STR channels together
+    totalaverageSNR(datei_i,:)= mean(welch_average (:,[16:29]),2); %averaging all SNR channels
+    totalaverageM1(datei_i,:)= welch_average (:,30); % M1 channel
 %         h=s171109_normalizegame(welch_average, welch_freq)
 %     uiwait(h)
 %       
@@ -47,7 +50,10 @@ for datei_i=1:length(Liste)
 %     
     welch_average_norm= bsxfun(@rdivide, welch_average, normfaktor);
      welch_average=(welch_average_norm);
-      totalaveragenorm(datei_i,:)= mean(welch_average,2);  
+      %totalaveragenorm(datei_i,:)= mean(welch_average,2);
+      totalaveragenormSTR(datei_i,:)= mean(welch_average(:,[1:15]),2); %averaging all STR channels together
+      totalaveragenormSNR(datei_i,:)= mean(welch_average (:,[16:29]),2); %averaging all SNR channels
+      totalaveragenormM1(datei_i,:)= welch_average (:,30); % M1 channel
        
 %         plot(welch_freq,welch_average(:,:))
 %           title(aktuelle_datei{1,1}(1:14), 'Interpreter', 'none', 'FontSize', 8)  
@@ -71,13 +77,13 @@ for datei_i=1:length(Liste)
 %             set(gca, 'XMinorGrid', 'on')
 %          set(gca, 'YGrid', 'on')
          
-        clearvars -except totalaveragenorm LocFig Liste datei_i peaks_locs peaks_height totalaverage baseline mygca total_average2 total_average4 welch_freq
+        clearvars -except totalaveragenorm* LocFig Liste datei_i peaks_locs peaks_height totalaverage* baseline mygca total_average2 total_average4 welch_freq
 end
 
 figure
 hold on
-plot(welch_freq,totalaveragenorm(1,:))
-plot(welch_freq,totalaveragenorm(2,:))
+plot(welch_freq,totalaveragenormSNR(1,:))
+plot(welch_freq,totalaveragenormSNR(2,:))
 
 hold off
 ylim([0 20])
@@ -85,8 +91,8 @@ xlim([10 80])
 
 figure
 hold on
-plot(repmat(welch_freq,[1,]),(totalaveragenorm(1,:))','r')
-plot(repmat(welch_freq,[1,1]),(totalaveragenorm(2,:))','b')
+plot(repmat(welch_freq,[1,]),(totalaveragenormSNR(1,:))','r')
+plot(repmat(welch_freq,[1,1]),(totalaveragenormSNR(2,:))','b')
 
 hold off
 ylim([0 20])
@@ -94,8 +100,8 @@ xlim([10 80])
 
 figure
 hold on
-plot(repmat(welch_freq,[1,1]),(totalaverage([1],:))','r')
-plot(repmat(welch_freq,[1,1]),(totalaverage([2],:))','b')
+plot(repmat(welch_freq,[1,1]),(totalaverageSNR([1],:))','r')
+plot(repmat(welch_freq,[1,1]),(totalaverageSNR([2],:))','b')
 
 hold off
 ylim([0 20])
@@ -103,7 +109,7 @@ xlim([10 80])
 
 
 figure
-plot(welch_freq,totalaveragenorm(2,:)./totalaveragenorm(1,:))
+plot(welch_freq,totalaveragenormSNR(2,:)./totalaveragenormSNR(1,:))
 
 
 
