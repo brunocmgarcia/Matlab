@@ -15,8 +15,8 @@ for datei_i=1:length(Liste)
     data = ft_redefinetrial(cfg, data);  
     for i=1:length(data.trial) 
             welch(:,:,i)=(data.trial{1,i}')/800; 
-            [pxx(:,:,i), welch_freq(:,1)]=(pwelch(welch(:,:,i), hanning(100), [], 2048, 2000, 'psd'));  % mit hanning statt hamming 
-
+            [pxx(:,:,i), welch_freq(:,1)]=(pwelch(welch(:,:,i), hanning(200), [], 2048, 2000, 'psd'));  % mit hanning statt hamming 
+%considering the hanning window to be 0.1*fs, fs here being 2000
     end
     welch=pxx;
 	clearvars pxx
