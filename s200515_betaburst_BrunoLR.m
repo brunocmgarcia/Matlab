@@ -3,7 +3,7 @@
 % Extracting the characteristics of beta bursts and exporting them as a
 % single file for later statistical analysis.
 
-%% Load data file
+%% 1) Load data file
 
 clear all
 cd('C:\Users\bruno\Documents\LR3\4bruno\4bruno')
@@ -16,11 +16,13 @@ data.trial = cellfun(@(x) x ./ 800, data.trial,'un',0);
 %There is a gain (amplification) of 800 during the recording, so /800 goes it back to
 %the actual level
 
-%% Select Frequency for max beta power (pwelch - s190122_quickanddirtybetapower)
+%% 2) Select Frequency for max beta power (done in Christopher's script using pwelch - s190122_quickanddirtybetapower)
+
 %bp_tp00 = [];
 % In this other script the frequency for max beta power in TP21 was 23.44. 
 % Rounding it to 24 and using a range of +/-5 we have a bp range of [19 29]
-%% Pre-processing (Choose BP range and Channel Manually)
+
+%% 3) Pre-processing (Choose BP range and Channel Manually)
 
 cfg=[];
 cfg.reref='yes';
@@ -35,19 +37,19 @@ cfg=[];
 cfg.channel=30; %ch 30 is the M1
 onechannel=ft_selectdata(cfg,data);
 
-%% Apply hilbert transform to ch30 (or other of choice)
+%% 4) Apply hilbert transform to ch30 (or other of choice)
 
 cfg=[];
 cfg.hilbert='abs'; %you want the absolute value of the hilbert transform
 onechannelhilb=ft_preprocessing(cfg,onechannel);
 
-%% Smoothing 
+%% 5) Smoothing 
 
 %smoothdata uses (input data, dimension to smooth, smoothing method, window length)
 onechhilbsmoothed   = smoothdata(data.trial{1,1},2,'gaussian',(0.1*data.fsample)); 
 allchhilbsmoothed   = smoothdata([data.trial{1,:}],2,'gaussian',(0.1*data.fsample));
 
-%% Z-transform with mean and std deviation from baseline (TP00)
+%% 6) Z-transform with mean and std deviation from baseline (TP00)
 
 mean_onetp00 = sum (onechhilbsmoothed) ./ length(onechhilbsmoothed); %mean one channel
 mean_alltp00 = sum (allchhilbsmoothed) ./ length(allchhilbsmoothed); %mean all channels
@@ -56,7 +58,7 @@ sd_alltp00   = sqrt((sum((allchhilbsmoothed - mean_alltp00).^2)) ./ length(allch
 oneztransf   = (onechhilbsmoothed - mean_onetp00) ./ sd_onetp00;
 allztransf   = (allchhilbsmoothed - mean_alltp00) ./ sd_alltp00;
 
-%% Thresholding (Percentile 75) - one channel or all channels
+%% 7) Thresholding (Percentile 75) - one channel or all channels
 
 %defines the 75 percentile as your interest, considering the first trial or
 %alternatively all trials combined
@@ -71,7 +73,7 @@ Perzentilenkurve=((ones(length([onechannelhilb.trial{1,:}]),1))*Perzentile75)';
 % Perzentilenkurve(onechannelhilb.trial{1,1}<=Perzentilenkurve)=NaN;
 Perzentilenkurve([onechannelhilb.trial{1,:}]<=Perzentilenkurve)=NaN; 
 
-%% Burst characteristics 
+%% 8) Burst characteristics 
 
 %label when each burst start, ends, and how long it last
 ueberthreshold     =  diff( ~isnan([ NaN Perzentilenkurve NaN ]) );
@@ -90,7 +92,7 @@ for i = 1 : length(NumBlockLength)
     AreaUnderCurve(i)=trapz(onechannelhilbAlltrials(NumBlockStart(i):NumBlockEnd(i))) ... 
         - trapz(Perzentilenkurve(NumBlockStart(i):NumBlockEnd(i)));
 end
-%% Plotting
+%% 9) Plotting
 
 hFig=figure('Name','Band Pass Filtered Data, abs(Hilbert) and Percentile Curve')
 hAxes = gca;
@@ -116,4 +118,4 @@ histolength=histogram(NumBlockLength,[.1 .2 .3 .4 .5 .6 .7 .8 .9 inf], 'Normaliz
 figure('Name','Distribution of suprathreshold AUC(data) - AUC(percentile)')
 histoarea=histogram(AreaUnderCurve, 'Normalization', 'probability');
 
-%% Export Bursts' Characteristics
+%% 10) Export Bursts' Characteristics
