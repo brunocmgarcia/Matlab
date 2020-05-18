@@ -43,22 +43,22 @@ cfg=[];
 cfg.hilbert='abs'; %you want the absolute value of the hilbert transform
 onechannelhilb=ft_preprocessing(cfg,onechannel);
 
-%% 5) Smoothing 
+%% 5) Smoothing (smoothing output data from Hilbert transform for all trials in one channel)
 
 %smoothdata uses (input data, dimension to smooth, smoothing method, window length)
-onechhilbsmoothed   = smoothdata(data.trial{1,1},2,'gaussian',(0.1*data.fsample)); 
-allchhilbsmoothed   = smoothdata([data.trial{1,:}],2,'gaussian',(0.1*data.fsample));
+%onetrhilbsmoothed   = smoothdata(onechannelhilb.trial{1,1},2,'gaussian',(0.1*onechannelhilb.fsample)); %one trial
+alltrhilbsmoothed   = smoothdata([onechannelhilb.trial{1,:}],2,'gaussian',(0.1*onechannelhilb.fsample)); %all trials
 
 %% 6) Z-transform with mean and std deviation from baseline (TP00)
 
-mean_onetp00 = sum (onechhilbsmoothed) ./ length(onechhilbsmoothed); %mean one channel
-mean_alltp00 = sum (allchhilbsmoothed) ./ length(allchhilbsmoothed); %mean all channels
-sd_onetp00   = sqrt((sum((onechhilbsmoothed - mean_onetp00).^2)) ./ length(onechhilbsmoothed) ); %std deviation one channel
-sd_alltp00   = sqrt((sum((allchhilbsmoothed - mean_alltp00).^2)) ./ length(allchhilbsmoothed) ); %std deviation all channels
-oneztransf   = (onechhilbsmoothed - mean_onetp00) ./ sd_onetp00;
-allztransf   = (allchhilbsmoothed - mean_alltp00) ./ sd_alltp00;
+%mean_onetp00 = sum (onetrhilbsmoothed) ./ length(onetrhilbsmoothed); %mean one channel
+mean_alltp00 = sum (alltrhilbsmoothed) ./ length(alltrhilbsmoothed); %mean all channels
+%sd_onetp00   = sqrt((sum((onetrhilbsmoothed - mean_onetp00).^2)) ./ length(onetrhilbsmoothed) ); %std deviation one channel
+sd_alltp00   = sqrt((sum((alltrhilbsmoothed - mean_alltp00).^2)) ./ length(alltrhilbsmoothed) ); %std deviation all channels
+%oneztransf   = (onetrhilbsmoothed - mean_onetp00) ./ sd_onetp00;
+allztransf   = (alltrhilbsmoothed - mean_alltp00) ./ sd_alltp00;
 
-%% 7) Thresholding (Percentile 75) - one channel or all channels
+%% 7) Thresholding (Percentile 75) - one trial or all trials
 
 %defines the 75 percentile as your interest, considering the first trial or
 %alternatively all trials combined
