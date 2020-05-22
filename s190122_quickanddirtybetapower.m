@@ -15,8 +15,8 @@ for datei_i=1:length(Liste)
     data = ft_redefinetrial(cfg, data);  
     for i=1:length(data.trial) 
             welch(:,:,i)=(data.trial{1,i}')/800; 
-            [pxx(:,:,i), welch_freq(:,1)]=(pwelch(welch(:,:,i), hanning(200), [], 2048, 2000, 'psd'));  % mit hanning statt hamming 
-%considering the hanning window to be 0.1*fs, fs here being 2000
+            [pxx(:,:,i), welch_freq(:,1)]=(pwelch(welch(:,:,i), hanning(899), [], 2048, 2000, 'psd'));  % mit hanning statt hamming 
+% fs here being 2000
     end
     welch=pxx;
 	clearvars pxx
@@ -82,8 +82,8 @@ end
 
 figure
 hold on
-plot(welch_freq,totalaveragenormSNR(1,:))
-plot(welch_freq,totalaveragenormSNR(2,:))
+plot(welch_freq,totalaveragenormM1(1,:))
+plot(welch_freq,totalaveragenormM1(2,:))
 
 hold off
 ylim([0 20])
@@ -91,8 +91,8 @@ xlim([10 80])
 
 figure
 hold on
-plot(repmat(welch_freq,[1,]),(totalaveragenormSNR(1,:))','r')
-plot(repmat(welch_freq,[1,1]),(totalaveragenormSNR(2,:))','b')
+plot(repmat(welch_freq,[1,]),(totalaveragenormM1(1,:))','r')
+plot(repmat(welch_freq,[1,1]),(totalaveragenormM1(2,:))','b')
 
 hold off
 ylim([0 20])
@@ -100,8 +100,8 @@ xlim([10 80])
 
 figure
 hold on
-plot(repmat(welch_freq,[1,1]),(totalaverageSNR([1],:))','r')
-plot(repmat(welch_freq,[1,1]),(totalaverageSNR([2],:))','b')
+plot(repmat(welch_freq,[1,1]),(totalaverageM1([1],:))','r')
+plot(repmat(welch_freq,[1,1]),(totalaverageM1([2],:))','b')
 
 hold off
 ylim([0 20])
@@ -109,7 +109,7 @@ xlim([10 80])
 
 
 figure
-plot(welch_freq,totalaveragenormSNR(2,:)./totalaveragenormSNR(1,:))
+plot(welch_freq,totalaveragenormM1(2,:)./totalaveragenormM1(1,:))
 
 
 
