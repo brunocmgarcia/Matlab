@@ -3,12 +3,13 @@
 % Extracting the characteristics of beta bursts and exporting them as a
 % single struct file for later statistical analysis.
 %
-%
+% Manual inputs: Step 1) CG, TP, LB, Region ; Step 3) cfg.bpfreq,
+% cfg.channel
 
 %% 1) Load data file (Manually write CG, TP and LB - First one must be TP00)
 
 clear all
-cd('C:\Users\bruno\Documents\LR3\4bruno\4bruno')
+cd('C:\Users\bruno\Documents\LR3\4bruno\4bruno\Data')
 
 % Liste=dir('*Ruhe*');
 % Liste={Liste.name}';
@@ -16,6 +17,7 @@ cd('C:\Users\bruno\Documents\LR3\4bruno\4bruno')
 CG = 'CG04'; %Input animal number
 TP = 'TP21'; %Input date relative to 6OHDA injection
 LB = 'Ruhe'; %Input condition ('Ruhe', LB10, LB20,...)
+Region = 'SNR'; %Input region ('M1', 'STR', 'SNR'), and manually adjust step 3 accordingly
 load([CG  '_'  TP  '_'  LB  '.mat']);
 data.trial = cellfun(@(x) x ./ 800, data.trial,'un',0);
 %There is a gain (amplification) of 800 during the recording, so /800 goes it back to
@@ -24,8 +26,8 @@ data.trial = cellfun(@(x) x ./ 800, data.trial,'un',0);
 %% 2) Select Frequency for max beta power (done in Christopher's script using pwelch - s190122_quickanddirtybetapower)
 
 %bp_tp00 = [];
-% In this other script the frequency for max beta power in TP21 was 29. 
-% using a range of +/-5 we have a bp range of [24 34]
+% In this other script the frequency for max beta power in TP21 was 29 for M1, 17.58 for SNR, and no peak for STR . 
+% using a range of +/-5 we have a bp range of [24 34] for M1, [13 23] for SNR
 
 %% 3) Pre-processing (Choose BP range and Channel Manually)
 
@@ -34,12 +36,12 @@ cfg.reref='yes';
 cfg.refchannel=31; %rereferencing based on the ch31, subtracting everything from the cerebellum
 cfg.demean='yes'; %baseline correction, to subtract the mean from everything so the data is all araound 0 
 cfg.bpfilter='yes';
-cfg.bpfreq=[24 34]; % based on visual result of s190122_quickanddirtybetapower for the TP00 and TP21 (+/- 5)
+cfg.bpfreq=[13 23]; % based on visual interpretation of s190122_quickanddirtybetapower for the TP00 and TP21 (+/- 5), for this Region
 data=ft_preprocessing(cfg,data);
 %after this you have the bandpass filtered data and rereferenced to the cerebellum. 
 
 cfg=[];
-cfg.channel=30; %ch 30 is the M1
+cfg.channel=20; %ch 30 is the M1, ch1-15 is STR, and ch16-29 is SNR
 onechannel=ft_selectdata(cfg,data);
 
 %% 4) Apply hilbert transform 
@@ -64,7 +66,7 @@ if strcmp(TP, 'TP00')
     onechannelhilbztransf   = ([onechannelhilb.trial{1,:}] - zscore_mean) ./ zscore_sd;
 
 else
-    load (['C:\Users\bruno\Documents\LR3\4bruno\4bruno' filesep CG  '_TP00_'  LB '_' 'burst' filesep CG  '_TP00_'  LB  '_betaburst.mat']);
+    load (['C:\Users\bruno\Documents\LR3\4bruno\4bruno' filesep CG  '_TP00_'  LB '_' 'burst' filesep CG  '_TP00_'  LB  '_' Region '_betaburst.mat']);
     onechannelhilbztransf   = ([onechannelhilb.trial{1,:}] - betaburst.zscore_mean) ./ betaburst.zscore_sd;
 end
 
@@ -164,11 +166,12 @@ else
     betaburst.onechannelhilbztransf = onechannelhilbztransf;
 end
 
+cd ('C:\Users\bruno\Documents\LR3\4bruno\4bruno');
 mkdir ([ CG  '_'  TP  '_'  LB '_' 'burst'])
 export_path = (['C:\Users\bruno\Documents\LR3\4bruno\4bruno' filesep CG  '_'  TP  '_'  LB '_' 'burst']);
-savefig (hFig, [export_path filesep CG  '_'  TP  '_'  LB  '_bbhilbthresh'])
-saveas (burst_length,[export_path filesep CG  '_'  TP  '_'  LB  '_bbLength.png'])
-saveas (burst_AUC, [export_path filesep CG  '_'  TP  '_'  LB  '_bbAUC.png'])
-save([export_path filesep CG  '_'  TP  '_'  LB  '_betaburst.mat'], 'betaburst');
+savefig (hFig, [export_path filesep CG  '_'  TP  '_'  LB '_' Region '_bbhilbthresh'])
+saveas (burst_length,[export_path filesep CG  '_'  TP  '_'  LB '_' Region '_bbLength.png'])
+saveas (burst_AUC, [export_path filesep CG  '_'  TP  '_'  LB '_' Region '_bbAUC.png'])
+save([export_path filesep CG  '_'  TP  '_'  LB  '_' Region '_betaburst.mat'], 'betaburst');
 
 close all
