@@ -1,5 +1,5 @@
 clearvars
-cd('C:\Users\bruno\Documents\LR3\4bruno\4bruno')
+cd('C:\Users\bruno\Documents\LR3\4bruno\4bruno\Data')
 
     
 Liste=dir('*Ruhe*');
@@ -80,6 +80,7 @@ for datei_i=1:length(Liste)
         clearvars -except totalaveragenorm* LocFig Liste datei_i peaks_locs peaks_height totalaverage* baseline mygca total_average2 total_average4 welch_freq
 end
 
+%Plot M1 power density
 figure
 hold on
 plot(welch_freq,totalaveragenormM1(1,:))
@@ -87,16 +88,20 @@ plot(welch_freq,totalaveragenormM1(2,:))
 
 hold off
 ylim([0 20])
-xlim([10 80])
+xlim([10 40])
+ylabel ('Normalized power (A.U.)')
+xlabel ('Frequency (Hz)')
+title('M1 normalized power density')
+legend ({'TP00', 'TP21'});
 
-figure
-hold on
-plot(repmat(welch_freq,[1,]),(totalaveragenormM1(1,:))','r')
-plot(repmat(welch_freq,[1,1]),(totalaveragenormM1(2,:))','b')
-
-hold off
-ylim([0 20])
-xlim([10 80])
+% figure
+% hold on
+% plot(repmat(welch_freq,[1,]),(totalaveragenormM1(1,:))','r')
+% plot(repmat(welch_freq,[1,1]),(totalaveragenormM1(2,:))','b')
+% 
+% hold off
+% ylim([0 20])
+% xlim([10 80])
 
 figure
 hold on
@@ -104,14 +109,81 @@ plot(repmat(welch_freq,[1,1]),(totalaverageM1([1],:))','r')
 plot(repmat(welch_freq,[1,1]),(totalaverageM1([2],:))','b')
 
 hold off
-ylim([0 20])
+ylim([0 100])
 xlim([10 80])
-
+ylabel ('Power (A.U.)')
+xlabel ('Frequency (Hz)')
+title('M1 power density')
+legend ({'TP00', 'TP21'});
 
 figure
 plot(welch_freq,totalaveragenormM1(2,:)./totalaveragenormM1(1,:))
+ylabel ('Power ratio (TP21/TP00)')
+xlabel ('Frequency (Hz)')
+title ('M1 Power ratio')
 
+%Plot STR power density
+figure
+hold on
+plot(welch_freq,totalaveragenormSTR(1,:))
+plot(welch_freq,totalaveragenormSTR(2,:))
 
+hold off
+ylim([0 20])
+xlim([10 40])
+ylabel ('Normalized power (A.U.)')
+xlabel ('Frequency (Hz)')
+title('STR normalized power density')
+legend ({'TP00', 'TP21'});
 
+figure
+hold on
+plot(repmat(welch_freq,[1,1]),(totalaverageSTR([1],:))','r')
+plot(repmat(welch_freq,[1,1]),(totalaverageSTR([2],:))','b')
 
+hold off
+ylim([0 100])
+xlim([10 80])
+ylabel ('Power (A.U.)')
+xlabel ('Frequency (Hz)')
+title('STR power density')
+legend ({'TP00', 'TP21'});
 
+figure
+plot(welch_freq,totalaveragenormSTR(2,:)./totalaveragenormSTR(1,:))
+ylabel ('Power ratio (TP21/TP00)')
+xlabel ('Frequency (Hz)')
+title ('STR Power ratio')
+
+%Plot SNR power density
+figure
+hold on
+plot(welch_freq,totalaveragenormSNR(1,:))
+plot(welch_freq,totalaveragenormSNR(2,:))
+
+hold off
+ylim([0 20])
+xlim([10 40])
+ylabel ('Normalized power (A.U.)')
+xlabel ('Frequency (Hz)')
+title('SNR normalized power density')
+legend ({'TP00', 'TP21'});
+
+figure
+hold on
+plot(repmat(welch_freq,[1,1]),(totalaverageSNR([1],:))','r')
+plot(repmat(welch_freq,[1,1]),(totalaverageSNR([2],:))','b')
+
+hold off
+ylim([0 100])
+xlim([10 80])
+ylabel ('Power (A.U.)')
+xlabel ('Frequency (Hz)')
+title('SNR power density')
+legend ({'TP00', 'TP21'});
+
+figure
+plot(welch_freq,totalaveragenormSTR(2,:)./totalaveragenormSTR(1,:))
+ylabel ('Power ratio (TP21/TP00)')
+xlabel ('Frequency (Hz)')
+title ('SNR Power ratio')
