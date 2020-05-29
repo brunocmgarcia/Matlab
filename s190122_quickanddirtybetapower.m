@@ -80,6 +80,47 @@ for datei_i=1:length(Liste)
         clearvars -except totalaveragenorm* LocFig Liste datei_i peaks_locs peaks_height totalaverage* baseline mygca total_average2 total_average4 welch_freq
 end
 
+%% Export pwelch results as .mat file to do FOOOF in python
+%files for fooof script
+tp00_m1 = totalaverageM1 (1,:);
+tp21_m1 = totalaverageM1 (2,:);
+
+tp00_str = totalaverageSTR (1,:);
+tp21_str = totalaverageSTR (2,:);
+
+tp00_snr = totalaverageSNR (1,:);
+tp21_snr = totalaverageSNR (2,:);
+
+cd ('C:\Users\bruno\Documents\LR3\4bruno\4bruno');
+export_path = (['C:\Users\bruno\Documents\LR3\4bruno\4bruno']);
+
+save([export_path filesep 'ruhe_TP00_M1.mat'],  'welch_freq', 'tp00_m1');
+save([export_path filesep 'ruhe_TP21_M1.mat'],  'welch_freq', 'tp21_m1');
+
+save([export_path filesep 'ruhe_TP00_STR.mat'],  'welch_freq', 'tp00_str');
+save([export_path filesep 'ruhe_TP21_STR.mat'],  'welch_freq', 'tp21_str');
+
+save([export_path filesep 'ruhe_TP00_SNR.mat'],  'welch_freq', 'tp00_snr');
+save([export_path filesep 'ruhe_TP21_SNR.mat'],  'welch_freq', 'tp21_snr');
+
+% settings = struct();
+% f_range = [1,100];
+% fooof_results = fooof(welch_freq, tp21_m1, f_range, settings);
+
+
+%% Import FOOOF results from python and plot them
+
+fooofed_tp00_m1 = load ('fooofed_tp00_m1.mat');
+fooofed_tp21_m1 = load ('fooofed_tp21_m1.mat');
+
+fooofed_tp00_str = load ('fooofed_tp00_str.mat');
+fooofed_tp21_str = load ('fooofed_tp21_str.mat');
+
+fooofed_tp00_snr = load ('fooofed_tp00_snr.mat');
+fooofed_tp21_snr = load ('fooofed_tp21_snr.mat');
+
+%% Plotting 
+
 %Plot M1 power density
 figure
 hold on
