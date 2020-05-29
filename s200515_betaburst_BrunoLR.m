@@ -11,9 +11,6 @@
 clear all
 cd('C:\Users\bruno\Documents\LR3\4bruno\4bruno\Data')
 
-% Liste=dir('*Ruhe*');
-% Liste={Liste.name}';
-
 CG = 'CG04'; %Input animal number
 TP = 'TP21'; %Input date relative to 6OHDA injection
 LB = 'Ruhe'; %Input condition ('Ruhe', LB10, LB20,...)
@@ -24,9 +21,13 @@ data.trial = cellfun(@(x) x ./ 800, data.trial,'un',0);
 %the actual level
 
 %% 2) Select Frequency for max beta power (done in Christopher's script using pwelch - s190122_quickanddirtybetapower)
+%# Peak parameters in order (CF: center frequency of the extracted peak, PW: power of the peak, over and above 
+%the aperiodic component, BW: bandwidth of the extracted peak)
 
-%bp_tp00 = [];
-% In this other script the frequency for max beta power in TP21 was 29 for M1, 17.58 for SNR, and no peak for STR . 
+bp_tp21_m1 = load ('fooofed_tp21_m1.mat');
+bp_tp21_m1 = [(fooofed_tp21_m1.peak_params(1,1)-5) (fooofed_tp21_m1.peak_params(1,1)+5)];
+
+% In this other script the frequency for max beta power in TP21 was 29 for M1, 17.58 for SNR, and no peak for STR 
 % using a range of +/-5 we have a bp range of [24 34] for M1, [13 23] for SNR
 
 %% 3) Pre-processing (Choose BP range and Channel Manually)
