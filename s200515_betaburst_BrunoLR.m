@@ -25,7 +25,7 @@ data.trial = cellfun(@(x) x ./ 800, data.trial,'un',0);
 %the aperiodic component, BW: bandwidth of the extracted peak)
 
 bp_tp21_m1 = load ('fooofed_tp21_m1.mat');
-bp_tp21_m1 = [(fooofed_tp21_m1.peak_params(1,1)-5) (fooofed_tp21_m1.peak_params(1,1)+5)];
+bp_tp21_m1 = [((bp_tp21_m1.peak_params(1,1))-5) ((bp_tp21_m1.peak_params(1,1))+5)];
 
 % In this other script the frequency for max beta power in TP21 was 29 for M1, 17.58 for SNR, and no peak for STR 
 % using a range of +/-5 we have a bp range of [24 34] for M1, [13 23] for SNR
