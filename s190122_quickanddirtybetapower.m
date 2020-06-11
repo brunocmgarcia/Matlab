@@ -2,9 +2,8 @@ clearvars
 cd('C:\Users\bruno\Documents\LR3\4bruno\4bruno\Data')
 
     
-Liste=dir('*Ruhe*');
-Liste={Liste.name}';
-
+Liste=dir('*CG07*Ruhe*');
+Liste= {Liste.name};
 
 for datei_i=1:length(Liste)
   %  figure
@@ -82,32 +81,25 @@ end
 
 %% Export pwelch results as .mat file to do FOOOF in python
 %files for fooof script
-tp00_m1 = totalaverageM1 (1,:);
-tp21_m1 = totalaverageM1 (2,:);
+for tp_index = 1:length(Liste)
+    tp_m1 = totalaverageM1 (tp_index,:);
+    tp_str = totalaverageSTR (tp_index,:);
+    tp_snr = totalaverageSNR (tp_index,:);
+    
+    cd ('C:\Users\bruno\Documents\LR3\4bruno\4bruno');
+    export_path = (['C:\Users\bruno\Documents\LR3\4bruno\4bruno']);
+    save_ind = num2str(tp_index);
+    save([export_path filesep 'Ruhe_M1_'  save_ind '.mat'],  'welch_freq', 'tp_m1');
+    save([export_path filesep 'Ruhe_STR_' save_ind '.mat'],  'welch_freq', 'tp_str');
+    save([export_path filesep 'Ruhe_SNR_' save_ind '.mat'],  'welch_freq', 'tp_snr');
+    
+    save([export_path filesep 'Liste.mat'], 'Liste');
 
-tp00_str = totalaverageSTR (1,:);
-tp21_str = totalaverageSTR (2,:);
+    % settings = struct();
+    % f_range = [1,100];
+    % fooof_results = fooof(welch_freq, tp21_m1, f_range, settings);
 
-tp00_snr = totalaverageSNR (1,:);
-tp21_snr = totalaverageSNR (2,:);
-
-cd ('C:\Users\bruno\Documents\LR3\4bruno\4bruno');
-export_path = (['C:\Users\bruno\Documents\LR3\4bruno\4bruno']);
-
-save([export_path filesep 'ruhe_TP00_M1.mat'],  'welch_freq', 'tp00_m1');
-save([export_path filesep 'ruhe_TP21_M1.mat'],  'welch_freq', 'tp21_m1');
-
-save([export_path filesep 'ruhe_TP00_STR.mat'],  'welch_freq', 'tp00_str');
-save([export_path filesep 'ruhe_TP21_STR.mat'],  'welch_freq', 'tp21_str');
-
-save([export_path filesep 'ruhe_TP00_SNR.mat'],  'welch_freq', 'tp00_snr');
-save([export_path filesep 'ruhe_TP21_SNR.mat'],  'welch_freq', 'tp21_snr');
-
-% settings = struct();
-% f_range = [1,100];
-% fooof_results = fooof(welch_freq, tp21_m1, f_range, settings);
-
-
+end
 %% Import FOOOF results from python and plot them
 
 fooofed_tp00_m1 = load ('fooofed_tp00_m1.mat');
@@ -126,7 +118,9 @@ figure
 hold on
 plot(welch_freq,totalaveragenormM1(1,:))
 plot(welch_freq,totalaveragenormM1(2,:))
-
+% for plot_index = 1:length(Liste)
+%     plot(welch_freq,totalaveragenormM1(plot_index,:))
+% end
 hold off
 ylim([0 20])
 xlim([10 40])
