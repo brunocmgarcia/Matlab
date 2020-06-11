@@ -11,10 +11,10 @@
 clear all
 cd('C:\Users\bruno\Documents\LR3\4bruno\4bruno\Data')
 
-CG = 'CG04'; %Input animal number
-TP = 'TP21'; %Input date relative to 6OHDA injection
+CG = 'CG07'; %Input animal number
+TP = 'TP31'; %Input date relative to 6OHDA injection
 LB = 'Ruhe'; %Input condition ('Ruhe', LB10, LB20,...)
-Region = 'M1'; %Input region ('M1', 'STR', 'SNR'), and manually adjust step 3 accordingly
+Region = 'SNR'; %Input region ('M1', 'STR', 'SNR'), and manually adjust step 3 accordingly
 load([CG  '_'  TP  '_'  LB  '.mat']);
 data.trial = cellfun(@(x) x ./ 800, data.trial,'un',0);
 %There is a gain (amplification) of 800 during the recording, so /800 goes it back to
@@ -37,13 +37,13 @@ cfg.reref='yes';
 cfg.refchannel=31; %rereferencing based on the ch31, subtracting everything from the cerebellum
 cfg.demean='yes'; %baseline correction, to subtract the mean from everything so the data is all araound 0 
 cfg.bpfilter='yes';
-cfg.bpfreq=[25 35]; % based on visual interpretation of s190122_quickanddirtybetapower for the TP00 and TP21 (+/- 5), for this Region
-%Use same bp as M1 for STR in case there is no beta peak after fooof
+cfg.bpfreq=[22 32]; % based on visual interpretation of s190122_quickanddirtybetapower for the TP00 and TP21 (+/- 5), for this Region
+%Use same bp as M1 for STR or SNR in case there is no beta peak after fooof
 data=ft_preprocessing(cfg,data);
 %after this you have the bandpass filtered data and rereferenced to the cerebellum. 
 
 cfg=[];
-cfg.channel=30; %ch 30 is the M1, ch1-15 is STR, and ch16-29 is SNR (I used ch10 for STR and 20 for SNR)
+cfg.channel=20; %ch 30 is the M1, ch1-15 is STR, and ch16-29 is SNR (I used ch10 for STR and 20 for SNR)
 onechannel=ft_selectdata(cfg,data);
 
 %% 4) Apply hilbert transform 
@@ -158,7 +158,7 @@ else
     hold on
 %    histolength  = histogram (NumBlockLength,[.1 .2 .3 .4 .5 .6 .7 .8 .9 inf], 'Normalization', 'probability');
     histolength  = histogram (NumBlockLength,[0:0.03:1], 'Normalization', 'probability');
-    legend ('TP00', 'TP21')
+    legend ('TP00', TP)
     hold off
 end
 
@@ -173,7 +173,7 @@ else
     burst_AUC = openfig (['C:\Users\bruno\Documents\LR3\4bruno\4bruno' filesep CG  '_TP00_'  LB '_' 'burst' filesep CG  '_TP00_'  LB  '_' Region '_bbAUC.fig']);
     hold on
     histoarea = histogram (AreaUnderCurve, [0:50:2000], 'Normalization', 'probability');
-    legend ('TP00', 'TP21')
+    legend ('TP00', TP)
     hold off
 end
 
