@@ -1,8 +1,11 @@
 clearvars
 cd('C:\Users\bruno\Documents\LR3\4bruno\4bruno\Data')
-
+% !!! MANUAL INPUTS !!!
+% 1) CG in dir search (for variables Liste and TPs)
+% 2) Channels to be averaged (in totalaverageM1, totalaverageSNR and
+% totalaverageSTR) - based on VAR_datakey.mat file
     
-Liste=dir('*CG07*Ruhe*');
+Liste=dir('*CG06*Ruhe*');
 Liste= {Liste.name};
 
 for datei_i=1:length(Liste)
@@ -21,8 +24,8 @@ for datei_i=1:length(Liste)
 	clearvars pxx
 	welch_average=mean(welch,3); %averaging all trials in each channel
     %totalaverage(datei_i,:)= mean(welch_average,2);%averaging all channels
-    totalaverageSTR(datei_i,:)= mean(welch_average(:,[1:15]),2); %averaging all STR channels together
-    totalaverageSNR(datei_i,:)= mean(welch_average (:,[16:29]),2); %averaging all SNR channels
+    totalaverageSTR(datei_i,:)= mean(welch_average(:,[3, 6, 7, 8, 9, 10, 12, 13, 14, 15]),2); %averaging all STR channels together
+    totalaverageSNR(datei_i,:)= mean(welch_average (:,[]),2); %averaging all SNR channels
     totalaverageM1(datei_i,:)= welch_average (:,30); % M1 channel
 %         h=s171109_normalizegame(welch_average, welch_freq)
 %     uiwait(h)
@@ -50,8 +53,8 @@ for datei_i=1:length(Liste)
     welch_average_norm= bsxfun(@rdivide, welch_average, normfaktor);
      welch_average=(welch_average_norm);
       %totalaveragenorm(datei_i,:)= mean(welch_average,2);
-      totalaveragenormSTR(datei_i,:)= mean(welch_average(:,[1:15]),2); %averaging all STR channels together
-      totalaveragenormSNR(datei_i,:)= mean(welch_average (:,[16:29]),2); %averaging all SNR channels
+      totalaveragenormSTR(datei_i,:)= mean(welch_average(:,[1:15]),2); %averaging all included STR channels together
+      totalaveragenormSNR(datei_i,:)= mean(welch_average(:,[16:29]),2); %averaging all included SNR channels
       totalaveragenormM1(datei_i,:)= welch_average (:,30); % M1 channel
        
 %         plot(welch_freq,welch_average(:,:))
@@ -81,7 +84,12 @@ end
 
 %% Export pwelch results as .mat file to do FOOOF in python
 %files for fooof script
+TPs = dir('*CG07*Ruhe*');
+TP_temp = (struct2cell( TPs ));
+
 for tp_index = 1:length(Liste)
+    TP = cell2mat( TP_temp (1,tp_index));
+    TP = extractBetween(TP,"_","_");
     tp_m1 = totalaverageM1 (tp_index,:);
     tp_str = totalaverageSTR (tp_index,:);
     tp_snr = totalaverageSNR (tp_index,:);
@@ -89,9 +97,9 @@ for tp_index = 1:length(Liste)
     cd ('C:\Users\bruno\Documents\LR3\4bruno\4bruno');
     export_path = (['C:\Users\bruno\Documents\LR3\4bruno\4bruno']);
     save_ind = num2str(tp_index);
-    save([export_path filesep 'Ruhe_M1_'  save_ind '.mat'],  'welch_freq', 'tp_m1');
-    save([export_path filesep 'Ruhe_STR_' save_ind '.mat'],  'welch_freq', 'tp_str');
-    save([export_path filesep 'Ruhe_SNR_' save_ind '.mat'],  'welch_freq', 'tp_snr');
+    save([export_path filesep 'Ruhe_M1_'  cell2mat(TP) '.mat'],  'welch_freq', 'tp_m1');
+    save([export_path filesep 'Ruhe_STR_' cell2mat(TP) '.mat'],  'welch_freq', 'tp_str');
+    save([export_path filesep 'Ruhe_SNR_' cell2mat(TP) '.mat'],  'welch_freq', 'tp_snr');
     
     save([export_path filesep 'Liste.mat'], 'Liste');
 
