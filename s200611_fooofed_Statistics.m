@@ -26,6 +26,40 @@ end
 %% average peak_params across animals for each timepoint (TP00-31) in each region
 % Peak parameters in order (CF: center frequency of the extracted peak, PW: power of 
 % the peak, over and above the aperiodic component, BW: bandwidth of the extracted peak)
+for cg_i = 1:length(CGs)
+        CG = CGs{cg_i};
+        cd(['C:\Users\bruno\Documents\LR3\4bruno\4bruno\'  CG '_Ruhe\fooofed'])
+        for tp_i = 1: length(TPs)
+            TP = TPs{tp_i};
+            if isfile (['fooofed_Ruhe_M1_' TP '.mat']) %check if this TP file exists
+                if ~isempty(all_fooof_stats.(CG).(TP).M1.peak_params)
+                    stats_max_center.(CG).M1{tp_i}  = all_fooof_stats.(CG).(TP).M1.peak_params(1); %center frequency of peak
+                    stats_max_power.(CG).M1{tp_i}  = all_fooof_stats.(CG).(TP).M1.peak_params(2); % power of peak
+                else
+                    stats_max_center.(CG).M1{tp_i}  = [];
+                    stats_max_power.(CG).M1{tp_i}   = [];
+                end
+                
+                if ~isempty(all_fooof_stats.(CG).(TP).STR.peak_params)
+                    stats_max_center.(CG).STR{tp_i}  = all_fooof_stats.(CG).(TP).STR.peak_params(1);
+                    stats_max_power.(CG).STR{tp_i}   = all_fooof_stats.(CG).(TP).STR.peak_params(2);
+                else
+                    stats_max_center.(CG).STR{tp_i}  = [];
+                    stats_max_power.(CG).STR{tp_i}   = [];
+                end
+                
+                if isfield(all_fooof_stats.(CG).(TP), 'SNR') && ~isempty(all_fooof_stats.(CG).(TP).SNR.peak_params)
+                    stats_max_center.(CG).SNR{tp_i}  = all_fooof_stats.(CG).(TP).SNR.peak_params(1);
+                    stats_max_power.(CG).SNR{tp_i}   = all_fooof_stats.(CG).(TP).SNR.peak_params(2);
+                else
+                    stats_max_center.(CG).SNR{tp_i}  = [];
+                    stats_max_power.(CG).SNR{tp_i}   = [];
+                end
+            end
+        end
+end
+
+
 for tp_i = 1: length(TPs)
     TP = TPs{tp_i};
     for cg_i = 1:length(CGs)
@@ -35,7 +69,6 @@ for tp_i = 1: length(TPs)
             if ~isempty(all_fooof_stats.(CG).(TP).M1.peak_params)
                stats_peak_center.(TP).M1{cg_i}  = all_fooof_stats.(CG).(TP).M1.peak_params(1); %center frequency of peak
                stats_peak_power.(TP).M1{cg_i}  = all_fooof_stats.(CG).(TP).M1.peak_params(2); % power of peak
-
             else
                stats_peak_center.(TP).M1{cg_i}  = [];
                stats_peak_power.(TP).M1{cg_i}   = [];
@@ -49,7 +82,7 @@ for tp_i = 1: length(TPs)
                stats_peak_power.(TP).STR{cg_i}   = [];
             end
             
-            if ~isempty(all_fooof_stats.(CG).(TP).SNR.peak_params)
+            if isfield(all_fooof_stats.(CG).(TP), 'SNR') && ~isempty(all_fooof_stats.(CG).(TP).SNR.peak_params)
                stats_peak_center.(TP).SNR{cg_i}  = all_fooof_stats.(CG).(TP).SNR.peak_params(1);
                stats_peak_power.(TP).SNR{cg_i}   = all_fooof_stats.(CG).(TP).SNR.peak_params(2);
             else
