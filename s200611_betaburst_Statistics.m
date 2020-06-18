@@ -20,10 +20,14 @@ for cg_i = 1:length(CGs)
             cd(['C:\Users\bruno\Documents\LR3\4bruno\4bruno\'  CG '_Ruhe\' CG '_'  TP '_Ruhe_burst'])
             burst_M1  = load([CG  '_'  TP  '_Ruhe_M1_betaburst.mat']);
             burst_STR = load([CG  '_'  TP  '_Ruhe_STR_betaburst.mat']);
-            burst_SNR = load([CG  '_'  TP  '_Ruhe_SNR_betaburst.mat']);
+            if ~strcmp(CG,'CG06')
+                burst_SNR = load([CG  '_'  TP  '_Ruhe_SNR_betaburst.mat']);
+            end
             all_data_stats.(CG).(TP).M1 = burst_M1.betaburst;
             all_data_stats.(CG).(TP).STR = burst_STR.betaburst;
-            all_data_stats.(CG).(TP).SNR = burst_SNR.betaburst;
+            if ~strcmp(CG,'CG06')
+                all_data_stats.(CG).(TP).SNR = burst_SNR.betaburst;
+            end
         end
     end
 end
@@ -36,22 +40,77 @@ for tp_i = 1: length(TPs)
     for cg_i = 1:length(CGs)
         CG = CGs{cg_i};
         cd(['C:\Users\bruno\Documents\LR3\4bruno\4bruno\'  CG '_Ruhe'])
-        if exist ([CG '_' TP '_Ruhe_burst'], 'dir')
-            stats_burst_length.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.NumBlockLength;
-            stats_burst_length.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.NumBlockLength;
-            stats_burst_length.(TP).SNR{cg_i} = all_data_stats.(CG).(TP).SNR.NumBlockLength;
-            
-            stats_burst_start.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.NumBlockStart;
-            stats_burst_start.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.NumBlockStart;
-            stats_burst_start.(TP).SNR{cg_i} = all_data_stats.(CG).(TP).SNR.NumBlockStart;
-            
-            stats_burst_area.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.AreaUnderCurve;
-            stats_burst_area.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.AreaUnderCurve;
-            stats_burst_area.(TP).SNR{cg_i} = all_data_stats.(CG).(TP).SNR.AreaUnderCurve;
+        if strcmp(CG,'CG06') %there were no good channels for SNR in CG06, so this is just to take this into account
+            if exist ([CG '_' TP '_Ruhe_burst'], 'dir')
+                stats_burst_length.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.NumBlockLength;
+                stats_burst_length.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.NumBlockLength;
+                stats_burst_length.(TP).SNR{cg_i} = [];
+                
+                stats_burst_BinNumber_Length.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinNumber_Length;
+                stats_burst_BinNumber_Length.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinNumber_Length;
+                stats_burst_BinNumber_Length.(TP).SNR{cg_i} = [];
+                
+                stats_burst_BinNumber_Area.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinNumber_Area;
+                stats_burst_BinNumber_Area.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinNumber_Area;
+                stats_burst_BinNumber_Area.(TP).SNR{cg_i} = [];
+                
+                stats_burst_BinEdges_Length.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinEdges_Length;
+                stats_burst_BinEdges_Length.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinEdges_Length;
+                stats_burst_BinEdges_Length.(TP).SNR{cg_i} = [];
+                
+                stats_burst_BinEdges_Area.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinEdges_Area;
+                stats_burst_BinEdges_Area.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinEdges_Area;
+                stats_burst_BinEdges_Area.(TP).SNR{cg_i} = [];
+                
+                stats_burst_BinPercentage_Length.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinPercentage_Length;
+                stats_burst_BinPercentage_Length.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinPercentage_Length;
+                stats_burst_BinPercentage_Length.(TP).SNR{cg_i} = [];
+                
+                stats_burst_BinPercentage_Area.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinPercentage_Area;
+                stats_burst_BinPercentage_Area.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinPercentage_Area;
+                stats_burst_BinPercentage_Area.(TP).SNR{cg_i} = [];
+                
+                stats_burst_area.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.AreaUnderCurve;
+                stats_burst_area.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.AreaUnderCurve;
+                stats_burst_area.(TP).SNR{cg_i} = [];
+            end
+        else
+            if exist ([CG '_' TP '_Ruhe_burst'], 'dir')
+                stats_burst_length.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.NumBlockLength;
+                stats_burst_length.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.NumBlockLength;
+                stats_burst_length.(TP).SNR{cg_i} = all_data_stats.(CG).(TP).SNR.NumBlockLength;
+                
+                stats_burst_BinNumber_Length.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinNumber_Length;
+                stats_burst_BinNumber_Length.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinNumber_Length;
+                stats_burst_BinNumber_Length.(TP).SNR{cg_i} = all_data_stats.(CG).(TP).SNR.BinNumber_Length;
+                
+                stats_burst_BinNumber_Area.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinNumber_Area;
+                stats_burst_BinNumber_Area.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinNumber_Area;
+                stats_burst_BinNumber_Area.(TP).SNR{cg_i} = all_data_stats.(CG).(TP).SNR.BinNumber_Area;
+                
+                stats_burst_BinEdges_Length.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinEdges_Length;
+                stats_burst_BinEdges_Length.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinEdges_Length;
+                stats_burst_BinEdges_Length.(TP).SNR{cg_i} = all_data_stats.(CG).(TP).SNR.BinEdges_Length;
+                
+                stats_burst_BinEdges_Area.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinEdges_Area;
+                stats_burst_BinEdges_Area.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinEdges_Area;
+                stats_burst_BinEdges_Area.(TP).SNR{cg_i} = all_data_stats.(CG).(TP).SNR.BinEdges_Area;
+                
+                stats_burst_BinPercentage_Length.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinPercentage_Length;
+                stats_burst_BinPercentage_Length.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinPercentage_Length;
+                stats_burst_BinPercentage_Length.(TP).SNR{cg_i} = all_data_stats.(CG).(TP).SNR.BinPercentage_Length;
+                
+                stats_burst_BinPercentage_Area.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.BinPercentage_Area;
+                stats_burst_BinPercentage_Area.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.BinPercentage_Area;
+                stats_burst_BinPercentage_Area.(TP).SNR{cg_i} = all_data_stats.(CG).(TP).SNR.BinPercentage_Area;
+                
+                stats_burst_area.(TP).M1{cg_i} = all_data_stats.(CG).(TP).M1.AreaUnderCurve;
+                stats_burst_area.(TP).STR{cg_i} = all_data_stats.(CG).(TP).STR.AreaUnderCurve;
+                stats_burst_area.(TP).SNR{cg_i} = all_data_stats.(CG).(TP).SNR.AreaUnderCurve;
+            end
         end
     end
 end
-
 
 %% Statistics comparing different time points
 % QQ plot (check for normal distribution. If yes: paired t test. If not: Wilcoxon rank sum test 
@@ -66,11 +125,11 @@ qqplot_length_snr = qqplot(cell2mat(stats_burst_length.TP00.SNR(1,:)));
 
 %Start QQ plots
 figure ('Name','Start M1 TP00');
-qqplot_start_m1  = qqplot(cell2mat(stats_burst_start.TP00.M1(1,:)));
+qqplot_start_m1  = qqplot(cell2mat(stats_burst_BinNumber_Length.TP00.M1(1,:)));
 figure ('Name','Start STR TP00');
-qqplot_start_str = qqplot(cell2mat(stats_burst_start.TP00.STR(1,:)));
+qqplot_start_str = qqplot(cell2mat(stats_burst_BinNumber_Length.TP00.STR(1,:)));
 figure ('Name','Start SNR TP00');
-qqplot_start_snr = qqplot(cell2mat(stats_burst_start.TP00.SNR(1,:)));
+qqplot_start_snr = qqplot(cell2mat(stats_burst_BinNumber_Length.TP00.SNR(1,:)));
 
 %Area QQ plots
 figure ('Name','Length M1 TP00');
@@ -88,9 +147,9 @@ kstest_length_str = kstest (cell2mat(stats_burst_length.TP00.STR(1,:)));
 kstest_length_snr = kstest (cell2mat(stats_burst_length.TP00.SNR(1,:)));
 
 %ktest for start
-kstest_start_m1  = kstest (cell2mat(stats_burst_start.TP00.M1(1,:))); 
-kstest_start_str = kstest (cell2mat(stats_burst_start.TP00.STR(1,:)));
-kstest_start_snr = kstest (cell2mat(stats_burst_start.TP00.SNR(1,:)));
+kstest_start_m1  = kstest (cell2mat(stats_burst_BinNumber_Length.TP00.M1(1,:))); 
+kstest_start_str = kstest (cell2mat(stats_burst_BinNumber_Length.TP00.STR(1,:)));
+kstest_start_snr = kstest (cell2mat(stats_burst_BinNumber_Length.TP00.SNR(1,:)));
 
 %ktest for area
 kstest_area_m1  = kstest (cell2mat(stats_burst_area.TP00.M1(1,:))); 
@@ -106,9 +165,9 @@ for tp_i = 1: length(TPs)
     p_ranksum.length.SNR.(TP) = ranksum ((cell2mat(stats_burst_length.TP00.SNR(1,:))) , (cell2mat(stats_burst_length.(TP).SNR(1,:)))); 
     
     %ranksum for burst start
-    p_ranksum.start.M1.(TP) = ranksum ((cell2mat(stats_burst_start.TP00.M1(1,:))) , (cell2mat(stats_burst_start.(TP).M1(1,:))));
-    p_ranksum.start.STR.(TP) = ranksum ((cell2mat(stats_burst_start.TP00.STR(1,:))) , (cell2mat(stats_burst_start.(TP).STR(1,:)))); 
-    p_ranksum.start.SNR.(TP) = ranksum ((cell2mat(stats_burst_start.TP00.SNR(1,:))) , (cell2mat(stats_burst_start.(TP).SNR(1,:)))); 
+    p_ranksum.start.M1.(TP) = ranksum ((cell2mat(stats_burst_BinNumber_Length.TP00.M1(1,:))) , (cell2mat(stats_burst_BinNumber_Length.(TP).M1(1,:))));
+    p_ranksum.start.STR.(TP) = ranksum ((cell2mat(stats_burst_BinNumber_Length.TP00.STR(1,:))) , (cell2mat(stats_burst_BinNumber_Length.(TP).STR(1,:)))); 
+    p_ranksum.start.SNR.(TP) = ranksum ((cell2mat(stats_burst_BinNumber_Length.TP00.SNR(1,:))) , (cell2mat(stats_burst_BinNumber_Length.(TP).SNR(1,:)))); 
     
     %ranksum for burst area
     p_ranksum.area.M1.(TP) = ranksum ((cell2mat(stats_burst_area.TP00.M1(1,:))) , (cell2mat(stats_burst_area.(TP).M1(1,:))));
@@ -154,7 +213,7 @@ hold off
 m1_start  = figure ('Name', 'M1 Start');
 for tp_i = 1: length(TPs)
     TP = TPs{tp_i};
-    m1_mean_start (tp_i)= (mean (cell2mat(stats_burst_start.(TP).M1(1,:))));
+    m1_mean_start (tp_i)= (mean (cell2mat(stats_burst_BinNumber_Length.(TP).M1(1,:))));
     bar (m1_mean_start)
     hold on
 end
@@ -164,7 +223,7 @@ hold off
 str_start  = figure ('Name', 'STR Start');
 for tp_i = 1: length(TPs)
     TP = TPs{tp_i};
-    str_mean_start (tp_i)= (mean (cell2mat(stats_burst_start.(TP).STR(1,:))));
+    str_mean_start (tp_i)= (mean (cell2mat(stats_burst_BinNumber_Length.(TP).STR(1,:))));
     bar (str_mean_start)
     hold on
 end
@@ -174,7 +233,7 @@ hold off
 snr_start  = figure ('Name', 'SNR Start');
 for tp_i = 1: length(TPs)
     TP = TPs{tp_i};
-    snr_mean_start (tp_i)= (mean (cell2mat(stats_burst_start.(TP).SNR(1,:))));
+    snr_mean_start (tp_i)= (mean (cell2mat(stats_burst_BinNumber_Length.(TP).SNR(1,:))));
     bar (snr_mean_start)
     hold on
 end
