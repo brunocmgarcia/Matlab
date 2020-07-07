@@ -114,35 +114,35 @@ end
 
 %% Statistics comparing different time points
 % QQ plot (check for normal distribution. If yes: paired t test. If not: Wilcoxon rank sum test 
-
+% 
 % %Length QQ plots
 % figure ('Name','Length M1 TP00');
-% qqplot_length_m1  = qqplot(cell2mat(stats_burst_length.TP00.M1(1,:)));
+% qqplot_length_m1  = qqplot(cellfun(@median, stats_burst_length.TP00.M1(1, :)));
 % figure ('Name','Length STR TP00');
-% qqplot_length_str = qqplot(cell2mat(stats_burst_length.TP00.STR(1,:)));
+% qqplot_length_str = qqplot(cellfun(@median, stats_burst_length.TP00.STR(1, :)));
 % figure ('Name','Length SNR TP00');
-% qqplot_length_snr = qqplot(cell2mat(stats_burst_length.TP00.SNR(1,:)));
-% 
+% qqplot_length_snr = qqplot(cellfun(@median, stats_burst_length.TP00.SNR(1, :)));
+
 % %Area QQ plots
-% figure ('Name','Length M1 TP00');
-% qqplot_area_m1  = qqplot(cell2mat(stats_burst_area.TP00.M1(1,:)));
-% figure ('Name','Length STR TP00');
+% figure ('Name','Area M1 TP00');
+% qqplot_area_m1  = qqplot(cellfun(@median, stats_burst_area.TP00.M1(1, :)));
+% % figure ('Name','Area STR TP00');
 % qqplot_area_str = qqplot(cell2mat(stats_burst_area.TP00.STR(1,:)));
-% figure ('Name','Length SNR TP00');
+% figure ('Name','Area SNR TP00');
 % qqplot_area_snr = qqplot(cell2mat(stats_burst_area.TP00.SNR(1,:)));
 
 
 % One-sample Kolmogorov-Smirnov test 
 %(for normality, if =1 then it rejects the null hypothesis that the data is normally distributed)
 %ktest for length
-kstest_length_m1  = kstest (cell2mat(stats_burst_length.TP00.M1(1,:))); 
-kstest_length_str = kstest (cell2mat(stats_burst_length.TP00.STR(1,:)));
-kstest_length_snr = kstest (cell2mat(stats_burst_length.TP00.SNR(1,:)));
+kstest_length_m1  = kstest (cellfun(@median, stats_burst_length.TP00.M1(1, :))); 
+kstest_length_str = kstest (cellfun(@median, stats_burst_length.TP00.STR(1, :)));
+kstest_length_snr = kstest (cellfun(@median, stats_burst_length.TP00.SNR(1, :)));
 
 %ktest for area
-kstest_area_m1  = kstest (cell2mat(stats_burst_area.TP00.M1(1,:))); 
-kstest_area_str = kstest (cell2mat(stats_burst_area.TP00.STR(1,:)));
-kstest_area_snr = kstest (cell2mat(stats_burst_area.TP00.SNR(1,:)));
+kstest_area_m1  = kstest (cellfun(@median, stats_burst_area.TP00.M1(1, :))); 
+kstest_area_str = kstest (cellfun(@median, stats_burst_area.TP00.STR(1, :)));
+kstest_area_snr = kstest (cellfun(@median, stats_burst_area.TP00.SNR(1, :)));
 
 %ktest for BinNumber_length
 kstest_BinNumber_Length_m1  = kstest (cell2mat(stats_burst_BinNumber_Length.TP00.M1(1,:))); 
@@ -175,16 +175,16 @@ for tp_i = 1: length(TPs)
             %comparison the statistics for these 2 TP are not possible (at
             %least for now, maybe there is a way - have to look for it)
             
-%             %signrank for mean burst length
-%             p_signrank.Burst_Length.M1.(TP) = signrank ((cell2mat(stats_burst_length.TP00.M1(1,:))) , (cell2mat(stats_burst_length.(TP).M1(1,:))));
-%             p_signrank.Burst_Length.STR.(TP) = signrank ((cell2mat(stats_burst_length.TP00.STR(1,:))) , (cell2mat(stats_burst_length.(TP).STR(1,:))));
-%             p_signrank.Burst_Length.SNR.(TP) = signrank ((cell2mat(stats_burst_length.TP00.SNR(1,:))) , (cell2mat(stats_burst_length.(TP).SNR(1,:))));
-%             
-%             %signrank for mean burst area
-%             p_signrank.Burst_Area.M1.(TP) = signrank ((cell2mat(stats_burst_area.TP00.M1(1,:))) , (cell2mat(stats_burst_area.(TP).M1(1,:))));
-%             p_signrank.Burst_Area.STR.(TP) = signrank ((cell2mat(stats_burst_area.TP00.STR(1,:))) , (cell2mat(stats_burst_area.(TP).STR(1,:))));
-%             p_signrank.Burst_Area.SNR.(TP) = signrank ((cell2mat(stats_burst_area.TP00.SNR(1,:))) , (cell2mat(stats_burst_area.(TP).SNR(1,:))));
-%             
+            %signrank for median burst length
+            p_signrank.Burst_Length.M1.(TP) = signrank (cellfun(@median, stats_burst_length.TP00.M1(1, :)), cellfun(@median, stats_burst_length.(TP).M1(1, :)));
+            p_signrank.Burst_Length.STR.(TP) = signrank (cellfun(@median, stats_burst_length.TP00.STR(1, :)), cellfun(@median, stats_burst_length.(TP).STR(1, :)));
+            p_signrank.Burst_Length.SNR.(TP) = signrank (cellfun(@median, stats_burst_length.TP00.SNR(1, :)), cellfun(@median, stats_burst_length.(TP).SNR(1, :)));
+            
+            %signrank for median burst area
+            p_signrank.Burst_Area.M1.(TP) = signrank (cellfun(@median, stats_burst_area.TP00.M1(1, :)), cellfun(@median, stats_burst_area.(TP).M1(1, :)));
+            p_signrank.Burst_Area.STR.(TP) = signrank (cellfun(@median, stats_burst_area.TP00.STR(1, :)), cellfun(@median, stats_burst_area.(TP).STR(1, :)));
+            p_signrank.Burst_Area.SNR.(TP) = signrank (cellfun(@median, stats_burst_area.TP00.SNR(1, :)), cellfun(@median, stats_burst_area.(TP).SNR(1, :)));
+            
             %signrank for binned number length
             p_signrank.BinNumber_Length.M1.(TP) = signrank ((cell2mat(stats_burst_BinNumber_Length.TP00.M1(1,:))) , (cell2mat(stats_burst_BinNumber_Length.(TP).M1(1,:))));
             p_signrank.BinNumber_Length.STR.(TP) = signrank ((cell2mat(stats_burst_BinNumber_Length.TP00.STR(1,:))) , (cell2mat(stats_burst_BinNumber_Length.(TP).STR(1,:))));
@@ -220,6 +220,7 @@ for tp_i = 1: length(TPs)
     hold on
 end
 xticklabels(TPs);
+ylabel ('Burst Duration (s)')
 hold off
 
 str_length  = figure ('Name', 'Median STR Burst Length');
@@ -230,6 +231,7 @@ for tp_i = 1: length(TPs)
     hold on
 end
 xticklabels(TPs);
+ylabel ('Burst Duration (s)')
 hold off 
 
 snr_length  = figure ('Name', 'Median SNR Burst Length');
@@ -240,6 +242,7 @@ for tp_i = 1: length(TPs)
     hold on
 end
 xticklabels(TPs);
+ylabel ('Burst Duration (s)')
 hold off
 
 
@@ -252,6 +255,7 @@ for tp_i = 1: length(TPs)
     hold on
 end
 xticklabels(TPs);
+ylabel ('Burst area (A.U.)')
 hold off
 
 str_area  = figure ('Name', 'Median STR Burst Area');
@@ -262,6 +266,7 @@ for tp_i = 1: length(TPs)
     hold on
 end
 xticklabels(TPs);
+ylabel ('Burst area (A.U.)')
 hold off 
 
 snr_area  = figure ('Name', 'Median SNR Burst Area');
@@ -272,10 +277,11 @@ for tp_i = 1: length(TPs)
     hold on
 end
 xticklabels(TPs);
+ylabel ('Burst area (A.U.)')
 hold off
 
 % Percentage Binned Length
-m1_start  = figure ('Name', 'Median M1 Binned Length');
+m1_start  = figure ('Name', 'Median M1 % Binned Length');
 for tp_i = 1: length(TPs)
     TP = TPs{tp_i};
     m1_median_binlength (tp_i)= (median (cell2mat(stats_burst_BinPercentage_Length.(TP).M1(1,:))));
@@ -285,17 +291,17 @@ end
 xticklabels(TPs);
 hold off
 
-str_start  = figure ('Name', 'Median STR Binned Length');
+str_start  = figure ('Name', 'Median STR % Binned Length');
 for tp_i = 1: length(TPs)
     TP = TPs{tp_i};
-    str_median_binlength (tp_i)= (median (cell2mat(stats_burst_BinPercentage_Length.(TP).STR(1,:))));
+    str_median_binlength (tp_i)= (mean (cell2mat(stats_burst_BinPercentage_Length.(TP).STR(1,:))));
     bar (str_median_binlength)
     hold on
 end
 xticklabels(TPs);
 hold off 
 
-snr_start  = figure ('Name', 'Median SNR Binned Length');
+snr_start  = figure ('Name', 'Median SNR % Binned Length');
 for tp_i = 1: length(TPs)
     TP = TPs{tp_i};
     snr_median_binlength (tp_i)= (median (cell2mat(stats_burst_BinPercentage_Length.(TP).SNR(1,:))));
@@ -306,7 +312,7 @@ xticklabels(TPs);
 hold off
 
 % Percentage Binned Area
-m1_start  = figure ('Name', 'Median M1 Binned Area');
+m1_start  = figure ('Name', 'Median M1 % Binned Area');
 for tp_i = 1: length(TPs)
     TP = TPs{tp_i};
     m1_median_binArea (tp_i)= (median (cell2mat(stats_burst_BinPercentage_Area.(TP).M1(1,:))));
@@ -316,7 +322,7 @@ end
 xticklabels(TPs);
 hold off
 
-str_start  = figure ('Name', 'Median STR Binned Area');
+str_start  = figure ('Name', 'Median STR % Binned Area');
 for tp_i = 1: length(TPs)
     TP = TPs{tp_i};
     str_median_binArea (tp_i)= (median (cell2mat(stats_burst_BinPercentage_Area.(TP).STR(1,:))));
@@ -326,7 +332,7 @@ end
 xticklabels(TPs);
 hold off 
 
-snr_start  = figure ('Name', 'Median SNR Binned Area');
+snr_start  = figure ('Name', 'Median SNR % Binned Area');
 for tp_i = 1: length(TPs)
     TP = TPs{tp_i};
     snr_median_binArea (tp_i)= (median (cell2mat(stats_burst_BinPercentage_Area.(TP).SNR(1,:))));
@@ -337,7 +343,7 @@ xticklabels(TPs);
 hold off
 
 
-%% Plot Binned results for burst length and area. One plot per TP
+%% Plot Binned results for burst length - M1
 
 %Creates a histogram with the median binned burst length across animals for each TP 
 Bin_Length = [0.03:0.03:1 inf];
@@ -345,26 +351,26 @@ for tp_i = 1: length(TPs)
     TP = TPs{tp_i};
     plot_binPercent_m1 (tp_i, :)= (median ((cell2mat(stats_burst_BinPercentage_Length.(TP).M1(1,:)')),1)); %median across CGs in one TP for each bin
 %     plot_binPercent_m1.(TP)= cell2mat(stats_burst_BinPercentage_Length.(TP).M1(1,:)');
-%     binLength_signrank = signrank ( plot_binPercent_m1.TP00(:,1), plot_binPercent_m1.(TP)(:,1) );
+%     if ~strcmp (TP, 'TP06') 
+%         if ~strcmp (TP, 'TP17')
+%             for bin_i = 1:length(Bin_Length)
+%                 binLength_signrank(bin_i) = signrank ( plot_binPercent_m1.TP00(:,bin_i), plot_binPercent_m1.(TP)(:,bin_i) );
+%             end
+%         end
+%     end
     if ~strcmp (TP, 'TP00')
         figure ('Name',  ['Binned Burst Length - M1 - ' (TP)])
         bar (Bin_Length, [plot_binPercent_m1(1,:);plot_binPercent_m1(tp_i,:)] )
-        xlabel('Bin Duration (ms)')
+        xlabel('Bin Duration (s)')
         ylabel ('Percentage of Bursts')
     end
 end
 
-for bin_i = 1:length (Bin_Length)
-    
-
-end
-
-
 figure ('Name', 'M1 Binned Burst Length')
 BinLength_bar = bar (Bin_Length, plot_binPercent_m1');
 set(BinLength_bar, {'DisplayName'}, TPs')
-xlabel('Bin Duration (ms)')
-% xlim([0 0.6])
+xlabel('Bin Duration (s)')
+xlim([0 0.6])
 ylabel ('Percentage of Bursts')
 legend() 
 
@@ -378,4 +384,119 @@ for plot_i = 1: length (Bin_Length)
 end
 
 
+%% Plot Binned results for burst length - STR
 
+%Creates a histogram with the median binned burst length across animals for each TP 
+Bin_Length = [0.03:0.03:1 inf];
+for tp_i = 1: length(TPs)
+    TP = TPs{tp_i};
+    plot_binPercent_str (tp_i, :)= (median ((cell2mat(stats_burst_BinPercentage_Length.(TP).STR(1,:)')),1)); %median across CGs in one TP for each bin
+%     plot_binPercent_m1.(TP)= cell2mat(stats_burst_BinPercentage_Length.(TP).M1(1,:)');
+%     if ~strcmp (TP, 'TP06') 
+%         if ~strcmp (TP, 'TP17')
+%             for bin_i = 1:length(Bin_Length)
+%                 binLength_signrank(bin_i) = signrank ( plot_binPercent_m1.TP00(:,bin_i), plot_binPercent_m1.(TP)(:,bin_i) );
+%             end
+%         end
+%     end
+
+%     if ~strcmp (TP, 'TP00')
+%         figure ('Name',  ['Binned Burst Length - STR - ' (TP)])
+%         bar (Bin_Length, [plot_binPercent_str(1,:);plot_binPercent_str(tp_i,:)] )
+%         xlabel('Bin Duration (ms)')
+%         ylabel ('Percentage of Bursts')
+%     end
+end
+
+figure ('Name', 'STR Binned Burst Length')
+BinLength_bar = bar (Bin_Length, plot_binPercent_str');
+set(BinLength_bar, {'DisplayName'}, TPs')
+xlabel('Bin Duration (s)')
+xlim([0 0.6])
+ylabel ('Percentage of Bursts')
+legend() 
+
+%% Plot Binned results for burst length - SNR
+
+%Creates a histogram with the median binned burst length across animals for each TP 
+Bin_Length = [0.03:0.03:1 inf];
+for tp_i = 1: length(TPs)
+    TP = TPs{tp_i};
+    plot_binPercent_snr (tp_i, :)= (median ((cell2mat(stats_burst_BinPercentage_Length.(TP).SNR(1,:)')),1)); %median across CGs in one TP for each bin
+%     plot_binPercent_m1.(TP)= cell2mat(stats_burst_BinPercentage_Length.(TP).M1(1,:)');
+%     if ~strcmp (TP, 'TP06') 
+%         if ~strcmp (TP, 'TP17')
+%             for bin_i = 1:length(Bin_Length)
+%                 binLength_signrank(bin_i) = signrank ( plot_binPercent_m1.TP00(:,bin_i), plot_binPercent_m1.(TP)(:,bin_i) );
+%             end
+%         end
+%     end
+
+%     if ~strcmp (TP, 'TP00')
+%         figure ('Name',  ['Binned Burst Length - SNR - ' (TP)])
+%         bar (Bin_Length, [plot_binPercent_snr(1,:);plot_binPercent_snr(tp_i,:)] )
+%         xlabel('Bin Duration (ms)')
+%         ylabel ('Percentage of Bursts')
+%     end
+end
+
+figure ('Name', 'SNR Binned Burst Length')
+BinLength_bar = bar (Bin_Length, plot_binPercent_snr');
+set(BinLength_bar, {'DisplayName'}, TPs')
+xlabel('Bin Duration (s)')
+xlim([0 0.6])
+ylabel ('Percentage of Bursts')
+legend() 
+
+
+
+%% Plot Binned results for burst Area - M1
+
+%Creates a histogram with the median binned burst area across animals for each TP 
+Bin_Area = [20:20:1000 inf];
+for tp_i = 1: length(TPs)
+    TP = TPs{tp_i};
+    plot_binPercent_m1a (tp_i, :)= (median ((cell2mat(stats_burst_BinPercentage_Area.(TP).M1(1,:)')),1)); %median across CGs in one TP for each bin
+end
+
+figure ('Name', 'M1 Binned Burst Area')
+BinArea_bar = bar (Bin_Area, plot_binPercent_m1a');
+set(BinArea_bar, {'DisplayName'}, TPs')
+xlabel('Bin Area (A.U.)')
+%xlim([0 0.6])
+ylabel ('Percentage of Bursts')
+legend() 
+
+%% Plot Binned results for burst area - STR
+
+%Creates a histogram with the median binned burst area across animals for each TP 
+Bin_Area = [20:20:1000 inf];
+for tp_i = 1: length(TPs)
+    TP = TPs{tp_i};
+    plot_binPercent_stra (tp_i, :)= (median ((cell2mat(stats_burst_BinPercentage_Area.(TP).STR(1,:)')),1)); %median across CGs in one TP for each bin
+end
+
+figure ('Name', 'STR Binned Burst Area')
+BinArea_bar = bar (Bin_Area, plot_binPercent_stra');
+set(BinArea_bar, {'DisplayName'}, TPs')
+xlabel('Bin Area (A.U.)')
+%xlim([0 0.6])
+ylabel ('Percentage of Bursts')
+legend() 
+
+%% Plot Binned results for burst area - SNR
+
+%Creates a histogram with the median binned burst length across animals for each TP 
+Bin_Area = [20:20:1000 inf];
+for tp_i = 1: length(TPs)
+    TP = TPs{tp_i};
+    plot_binPercent_snra (tp_i, :)= (median ((cell2mat(stats_burst_BinPercentage_Area.(TP).SNR(1,:)')),1)); %median across CGs in one TP for each bin
+end
+
+figure ('Name', 'SNR Binned Burst Area')
+BinArea_bar = bar (Bin_Area, plot_binPercent_snra');
+set(BinArea_bar, {'DisplayName'}, TPs')
+xlabel('Bin Area (A.U.)')
+%xlim([0 0.6])
+ylabel ('Percentage of Bursts')
+legend() 
